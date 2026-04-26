@@ -68,22 +68,31 @@
         .launch-options button:hover { background: var(--accent); border-color: var(--accent); }
         .game-container { width: 100%; max-width: 900px; background: var(--surface-color); border-radius: 12px; padding: 30px; position: relative; margin: auto; box-shadow: 0 10px 20px rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center;}
         .game-container > div { width: 100%; }
+        
         .category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; width: 100%; }
-        .cat-btn { padding: 20px; font-size: 1.1em; font-weight: bold; color: white; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .cat-btn { padding: 20px; font-size: 1.1em; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        
+        /* Fixed Colors */
+        .bg-t1d { background-color: var(--t1d) !important; color: white !important; }
+        .bg-ra { background-color: var(--ra) !important; color: white !important; }
+        .bg-allergy { background-color: var(--allergy) !important; color: white !important; }
+        .bg-pnh { background-color: var(--pnh) !important; color: white !important; }
+        
         .locked-out .cat-btn, .locked-out .g3-opt-btn, .locked-out .lifeline-btn { opacity: 0.4; filter: grayscale(100%); cursor: not-allowed; }
         .cat-btn:active:not(:disabled) { transform: scale(0.97); }
-        #btn-t1d { background-color: var(--t1d); } #btn-ra { background-color: var(--ra); }
-        #btn-allergy { background-color: var(--allergy); } #btn-pnh { background-color: var(--pnh); }
         .cat-hidden { visibility: hidden; pointer-events: none; }
+        
         #g1-active-item { background: var(--surface-highlight); padding: 30px; border-radius: 10px; font-size: 1.4em; text-align: center; font-weight: bold; min-height: 100px; display: flex; align-items: center; justify-content: center;}
         #g2-board { background: rgba(0,0,0,0.2); border: 2px dashed var(--surface-highlight); border-radius: 8px; padding: 20px; display: flex; flex-wrap: wrap; gap: 10px; min-height: 200px; max-height: 300px; overflow-y: auto; align-content: flex-start;}
         .keyword-chip { background: var(--surface-highlight); color: var(--accent); padding: 8px 14px; border-radius: 20px; font-size: 0.9em; border: 1px solid var(--accent); animation: popIn 0.2s; }
         @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        
         #g3-question { font-size: 1.3em; line-height: 1.6; margin-bottom: 30px; text-align: center; }
         .blank-space { border-bottom: 3px solid var(--accent); color: var(--accent); padding: 0 15px; font-weight: bold; }
         .g3-options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
         .g3-opt-btn { background: var(--surface-highlight); border: 2px solid #475569; color: white; padding: 15px; font-size: 1.1em; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s;}
         .g3-opt-btn:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); }
+        
         .modal-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 6000; }
         .modal { background: var(--surface-color); border-radius: 12px; width: 90%; max-width: 600px; border: 1px solid var(--surface-highlight); display: flex; flex-direction: column; max-height: 90vh; }
         .modal-header { position: sticky; top: 0; background: var(--surface-color); padding: 20px 30px; border-bottom: 1px solid var(--surface-highlight); display: flex; justify-content: space-between; align-items: center; border-radius: 12px 12px 0 0; z-index: 10;}
@@ -98,19 +107,19 @@
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85em; }
         th, td { border: 1px solid var(--surface-highlight); padding: 8px; text-align: left; }
         th { background-color: var(--accent); color: var(--bg-color); }
-        #slot-machine { font-size: 1.5em; font-weight: bold; height: 60px; overflow: hidden; background: var(--bg-color); border: 2px solid var(--warning); border-radius: 8px; margin: 20px 0; position: relative; }
-        #slot-strip { display: flex; flex-direction: column; text-align: center; transition: transform 2s cubic-bezier(0.1, 1, 0.2, 1); }
-        .slot-item { height: 60px; display: flex; justify-content: center; align-items: center; padding: 0 10px;}
+        
         #fidget-container { display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--surface-highlight); padding: 10px 20px; border-radius: 50px; border: 2px solid var(--danger); margin-top: 20px; width: fit-content; }
         #fidget-time { font-weight: bold; font-size: 1.5em; min-width: 35px; text-align: center;}
         #fidget-btn { background: var(--danger); color: white; border: none; border-radius: 20px; padding: 8px 20px; font-weight: bold; font-size: 1.1em; cursor: pointer; box-shadow: 0 4px 0 #991b1b; }
         #fidget-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #991b1b; }
         .urgent { color: var(--danger) !important; animation: pulse 0.5s infinite alternate; }
         @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+        
         #lifeline-container { display: flex; gap: 10px; width: 100%; justify-content: center; margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--surface-highlight); }
         .lifeline-btn { background: var(--surface-highlight); color: var(--text-main); border: 1px solid var(--accent); border-radius: 6px; padding: 10px 15px; font-weight: bold; cursor: pointer; flex: 1; max-width: 150px; transition: 0.2s; }
         .lifeline-btn:hover:not(:disabled) { background: var(--accent); color: #fff; }
-        .lifeline-btn:disabled { opacity: 0.3; cursor: not-allowed; border-color: var(--text-muted); }
+        .lifeline-btn:disabled { opacity: 0.8; cursor: not-allowed; border-color: var(--text-muted); color: var(--text-muted); }
+        
         .chart-container { display: flex; align-items: flex-end; justify-content: space-around; height: 200px; border-bottom: 2px solid var(--text-main); border-left: 2px solid var(--text-main); padding: 10px 10px 0 10px; margin-top: 20px; }
         .chart-bar-wrap { display: flex; flex-direction: column; align-items: center; width: 20%; height: 100%; justify-content: flex-end; }
         .chart-bar { width: 100%; background: var(--accent); border-radius: 4px 4px 0 0; transition: height 1s ease-out; height: 0; }
@@ -190,10 +199,10 @@
             </div>
             <div id="g1-active-item">Loading...</div>
             <div class="category-grid" id="g1-grid">
-                <button class="cat-btn" id="g1-btn-t1d" onclick="checkG1('T1D')">Type 1 Diabetes</button>
-                <button class="cat-btn" id="g1-btn-ra" onclick="checkG1('RA')">Rheumatoid Arthritis</button>
-                <button class="cat-btn" id="g1-btn-allergy" onclick="checkG1('Allergy')">Allergic Disorders</button>
-                <button class="cat-btn" id="g1-btn-pnh" onclick="checkG1('PNH')">PNH</button>
+                <button class="cat-btn bg-t1d" id="g1-btn-t1d" onclick="checkG1('T1D')">Type 1 Diabetes</button>
+                <button class="cat-btn bg-ra" id="g1-btn-ra" onclick="checkG1('RA')">Rheumatoid Arthritis</button>
+                <button class="cat-btn bg-allergy" id="g1-btn-allergy" onclick="checkG1('Allergy')">Allergic Disorders</button>
+                <button class="cat-btn bg-pnh" id="g1-btn-pnh" onclick="checkG1('PNH')">PNH</button>
             </div>
         </div>
     </div>
@@ -210,10 +219,10 @@
             </div>
             <div id="g2-board"></div>
             <div class="category-grid" id="g2-grid">
-                <button class="cat-btn" id="g2-btn-t1d" onclick="checkG2('T1D')">Type 1 Diabetes</button>
-                <button class="cat-btn" id="g2-btn-ra" onclick="checkG2('RA')">Rheumatoid Arthritis</button>
-                <button class="cat-btn" id="g2-btn-allergy" onclick="checkG2('Allergy')">Allergic Disorders</button>
-                <button class="cat-btn" id="g2-btn-pnh" onclick="checkG2('PNH')">PNH</button>
+                <button class="cat-btn bg-t1d" id="g2-btn-t1d" onclick="checkG2('T1D')">Type 1 Diabetes</button>
+                <button class="cat-btn bg-ra" id="g2-btn-ra" onclick="checkG2('RA')">Rheumatoid Arthritis</button>
+                <button class="cat-btn bg-allergy" id="g2-btn-allergy" onclick="checkG2('Allergy')">Allergic Disorders</button>
+                <button class="cat-btn bg-pnh" id="g2-btn-pnh" onclick="checkG2('PNH')">PNH</button>
             </div>
         </div>
     </div>
@@ -238,15 +247,15 @@
     </div>
 
     <div id="shared-components" style="display:none;">
-        <div id="fidget-container">
-            <span style="font-size: 0.8em; color:var(--text-muted);">SYS:</span>
-            <span id="fidget-time">30</span>
-            <button id="fidget-btn" onclick="hitFidget()">CLICK</button>
-        </div>
         <div id="lifeline-container">
             <button class="lifeline-btn" id="ll-fifty" onclick="useFifty()">50/50</button>
             <button class="lifeline-btn" id="ll-phone" onclick="usePhone()">Phone a Friend</button>
             <button class="lifeline-btn" id="ll-aud" onclick="useAudience()">Ask Audience</button>
+        </div>
+        <div id="fidget-container">
+            <span style="font-size: 0.8em; color:var(--text-muted);">SYS:</span>
+            <span id="fidget-time">30</span>
+            <button id="fidget-btn" onclick="hitFidget()">CLICK</button>
         </div>
     </div>
 
@@ -388,12 +397,12 @@
 <script>
 const AUDIO_BASE = "./audio/";
 const SOUNDS = {
-    start: ["usec1_start_01.wav", "usec2_start1.wav", "usec3_start_01.wav", "usec5_start_01.wav", "usec1_ready_01_l.wav", "usec4_ready_01_l.wav"],
-    good: ["usec1_goodwork_01_l.wav", "usec2_goodwork_02.wav", "usec3_goodwork_01.wav", "usec4_goodwork_01_l.wav", "usec5_goodwork_01_l.wav", "usec1_roger_01.wav"],
-    bad: ["usec1_badwork_01_l.wav", "usec1_negative_01_l.wav", "usec2_badwork1.wav", "usec3_badwork_01_l.wav", "usec4_badwork_01.wav", "usec3_ffire_01.wav"],
-    win: ["usec1_session_passed_01.wav", "usec2_session_passed_01.wav", "usec3_session_passed_01.wav", "usec1_fight_end_01.wav"],
-    fidget: ["usec1_breath_ok_01.wav", "usec2_breath_ok.wav", "usec3_breath_ok.wav", "usec1_key_01.wav"],
-    reroll: ["usec1_canyouhearit_01.wav", "usec3_mutter_01.wav", "usec4_mutter_01.wav"]
+    start:["usec1_start_01.wav", "usec2_start1.wav", "usec3_start_01.wav", "usec5_start_01.wav", "usec1_ready_01_l.wav", "usec4_ready_01_l.wav"],
+    good:["usec1_goodwork_01_l.wav", "usec2_goodwork_02.wav", "usec3_goodwork_01.wav", "usec4_goodwork_01_l.wav", "usec5_goodwork_01_l.wav", "usec1_roger_01.wav"],
+    bad:["usec1_badwork_01_l.wav", "usec1_negative_01_l.wav", "usec2_badwork1.wav", "usec3_badwork_01_l.wav", "usec4_badwork_01.wav", "usec3_ffire_01.wav"],
+    win:["usec1_session_passed_01.wav", "usec2_session_passed_01.wav", "usec3_session_passed_01.wav", "usec1_fight_end_01.wav"],
+    fidget:["usec1_breath_ok_01.wav", "usec2_breath_ok.wav", "usec3_breath_ok.wav", "usec1_key_01.wav"],
+    reroll:["usec1_canyouhearit_01.wav", "usec3_mutter_01.wav", "usec4_mutter_01.wav"]
 };
 
 function playSound(type) {
@@ -408,7 +417,7 @@ function playSound(type) {
 }
 
 const DATA = {
-    T1D: [
+    T1D:[
         "Organ-specific autoimmune disease", "Breakdown of immunological self-tolerance", "Destruction of insulin-producing pancreatic beta cells",
         "Initial presentation of autoantigens", "Dendritic cells", "Naive T cells in the pancreatic lymph nodes",
         "Cell-mediated adaptive immune response", "CD4 positive T helper 1 cells", "Secrete inflammatory cytokines",
@@ -419,7 +428,7 @@ const DATA = {
         "Insulin Autoantibodies (IAA)", "Chemiluminescence immunoassays", "Invalidated by exogenous insulin therapy",
         "Levy-Jennings charts", "Fasting plasma glucose & HbA1c", "Serum C-peptide"
     ],
-    RA: [
+    RA:[
         "Systemic autoimmune disorder", "Chronic inflammation and destruction of synovial joints",
         "Loss of tolerance to citrullinated proteins", "Immune complexes in synovial fluid", "Type III hypersensitivity reaction",
         "CD4 positive Th1 and Th17 subsets", "Pro-inflammatory cytokines (TNF-alpha and IL-6)",
@@ -429,7 +438,7 @@ const DATA = {
         "Antinuclear Antibody screen (ANA)", "Indirect immunofluorescence", "Differentiates RA from Systemic Lupus Erythematosus",
         "Costly downstream immunoblotting", "C-Reactive Protein (CRP)", "Erythrocyte Sedimentation Rate (ESR)"
     ],
-    Allergy: [
+    Allergy:[
         "Type I immediate hypersensitivity reaction", "Innocuous environmental antigens", "Clinically silent sensitisation phase",
         "T helper 2 cells secrete IL-4 and IL-13", "B cells undergo isotype switching to IgE",
         "High-affinity Fc-epsilon-RI receptors", "Tissue mast cells and circulating basophils",
@@ -439,7 +448,7 @@ const DATA = {
         "Sensitisation does not always equate to clinical reactivity", "Basophil Activation Test (CD63 marker via flow cytometry)",
         "Logistical requirement for freshly drawn whole blood"
     ],
-    PNH: [
+    PNH:[
         "Severe life-threatening disorder of the complement system", "Continuous uncontrolled destruction of red blood cells",
         "Acquired genetic mutation in the PIG-A gene", "Haematopoietic stem cells",
         "Prevents synthesis of glycosylphosphatidylinositol (GPI) anchors", "CD55 (decay accelerator)", "CD59 (C9 blocker)",
@@ -450,37 +459,37 @@ const DATA = {
 };
 
 const BLANKS = {
-    T1D: [
+    T1D:[
         { q: "Type 1 Diabetes leads to the destruction of insulin-producing pancreatic _____.", a: "beta cells", d: ["alpha cells", "macrophages", "dendritic cells"] },
         { q: "Autoantigens are initially presented by _____ to naive T cells in the lymph nodes.", a: "dendritic cells", d: ["neutrophils", "B cells", "basophils"] },
         { q: "Cytotoxic T cells infiltrate the _____ and induce beta cell apoptosis.", a: "islets of Langerhans", d: ["synovial joints", "thyroid follicles", "lymph nodes"] },
-        { q: "GADA is measured using _____.", a: "ELISA", d: ["Immunofluorescence", "Immunoturbidimetry", "Flow Cytometry"] },
-        { q: "Insulin Autoantibodies testing is invalidated by _____.", a: "exogenous insulin therapy", d: ["age-dependent positivity", "anti-histamines", "high staffing costs"] }
+        { q: "GADA is measured using _____.", a: "ELISA", d:["Immunofluorescence", "Immunoturbidimetry", "Flow Cytometry"] },
+        { q: "Insulin Autoantibodies testing is invalidated by _____.", a: "exogenous insulin therapy", d:["age-dependent positivity", "anti-histamines", "high staffing costs"] }
     ],
-    RA: [
-        { q: "RA begins with a loss of tolerance to _____.", a: "citrullinated proteins", d: ["GPI anchors", "environmental allergens", "insulin"] },
+    RA:[
+        { q: "RA begins with a loss of tolerance to _____.", a: "citrullinated proteins", d:["GPI anchors", "environmental allergens", "insulin"] },
         { q: "Immune complexes in the synovial fluid mimic a _____ hypersensitivity reaction.", a: "Type III", d: ["Type I", "Type II", "Type IV"] },
         { q: "Rheumatoid Factor is an _____ autoantibody.", a: "IgM", d: ["IgG", "IgA", "IgE"] },
-        { q: "Anti-CCP testing boasts high specificity and strongly predicts severe _____.", a: "erosive joint damage", d: ["intravascular haemolysis", "bronchoconstriction", "beta cell apoptosis"] },
-        { q: "ANA testing via Indirect Immunofluorescence differentiates RA from _____.", a: "Systemic Lupus", d: ["Type 1 Diabetes", "Osteoarthritis", "PNH"] }
+        { q: "Anti-CCP testing boasts high specificity and strongly predicts severe _____.", a: "erosive joint damage", d:["intravascular haemolysis", "bronchoconstriction", "beta cell apoptosis"] },
+        { q: "ANA testing via Indirect Immunofluorescence differentiates RA from _____.", a: "Systemic Lupus", d:["Type 1 Diabetes", "Osteoarthritis", "PNH"] }
     ],
-    Allergy: [
-        { q: "Allergic disorders are driven by a _____ immediate hypersensitivity reaction.", a: "Type I", d: ["Type II", "Type III", "Type IV"] },
-        { q: "B cells undergo isotype switching and produce allergen-specific _____.", a: "IgE antibodies", d: ["IgG antibodies", "IgM autoantibodies", "IgA antibodies"] },
+    Allergy:[
+        { q: "Allergic disorders are driven by a _____ immediate hypersensitivity reaction.", a: "Type I", d:["Type II", "Type III", "Type IV"] },
+        { q: "B cells undergo isotype switching and produce allergen-specific _____.", a: "IgE antibodies", d:["IgG antibodies", "IgM autoantibodies", "IgA antibodies"] },
         { q: "IgE binds to high-affinity _____ receptors.", a: "Fc-epsilon-RI", d: ["CD55", "CD59", "CD63"] },
         { q: "Skin Prick Testing is limited if the patient is taking _____ medications.", a: "anti-histamine", d: ["exogenous insulin", "Eculizumab", "immunosuppressive"] },
-        { q: "The Basophil Activation Test measures the upregulation of _____.", a: "CD63", d: ["CD55", "CD59", "C5"] }
+        { q: "The Basophil Activation Test measures the upregulation of _____.", a: "CD63", d:["CD55", "CD59", "C5"] }
     ],
-    PNH: [
+    PNH:[
         { q: "PNH stems from an acquired genetic mutation in the _____.", a: "PIG-A gene", d: ["Fc-epsilon-RI receptor", "CD63 marker", "IgE heavy chain"] },
-        { q: "The mutation prevents the synthesis of _____ anchors.", a: "GPI", d: ["CD55", "CD59", "C5"] },
-        { q: "Without anchors, erythrocytes lack CD55 and _____, making them susceptible to lysis.", a: "CD59", d: ["CD63", "C5a", "C9"] },
-        { q: "Erythrocytes are destroyed by the unregulated formation of the _____.", a: "Membrane Attack Complex", d: ["immune complexes", "synovial hyperplasia", "islets of Langerhans"] },
-        { q: "Eculizumab functions by binding specifically to complement protein _____.", a: "C5", d: ["C3", "C9", "CD55"] }
+        { q: "The mutation prevents the synthesis of _____ anchors.", a: "GPI", d:["CD55", "CD59", "C5"] },
+        { q: "Without anchors, erythrocytes lack CD55 and _____, making them susceptible to lysis.", a: "CD59", d:["CD63", "C5a", "C9"] },
+        { q: "Erythrocytes are destroyed by the unregulated formation of the _____.", a: "Membrane Attack Complex", d:["immune complexes", "synovial hyperplasia", "islets of Langerhans"] },
+        { q: "Eculizumab functions by binding specifically to complement protein _____.", a: "C5", d:["C3", "C9", "CD55"] }
     ]
 };
 
-const MARKER_REASONS = [
+const MARKER_REASONS =[
     "Car broke down this morning.", "Wife is cheating on me.", "Nearly lunch time, rushing marking.",
     "I don't like your handwriting.", "My back hurts.", "Spilled coffee on the rubric.",
     "Student didn't format bibliography correctly.", "Too much jargon used.", "Not enough jargon used."
@@ -494,7 +503,7 @@ let State = {
     isPaused: false,
     activeGame: null,
     isRanked: false,
-    lifelines: { fifty: false, phone: false, audience: false }
+    lifelines: { fifty: false, phone: false, aud: false }
 };
 
 let currentTotalQs = 0;
@@ -514,6 +523,7 @@ let fidgetInterval;
 let lockoutTimerInterval;
 let fidgetTime = 30;
 let isLockedOut = false;
+let cooldownTimers = { fifty: null, phone: null, aud: null };
 
 function init() {
     loadData();
@@ -625,6 +635,16 @@ function saveAndMenu() {
     switchView('view-menu');
 }
 
+function resetLifelineBtn(type, btnId, defaultText) {
+    clearInterval(cooldownTimers[type]);
+    let btn = document.getElementById(btnId);
+    if(btn) {
+        btn.disabled = false;
+        btn.textContent = defaultText;
+        btn.style.background = ""; 
+    }
+}
+
 function cleanupGameEnv() {
     State.activeGame = null;
     State.isPaused = false;
@@ -638,14 +658,21 @@ function cleanupGameEnv() {
     document.getElementById('exit-nosave-btn').style.display = 'none';
     document.getElementById('shared-components').appendChild(document.getElementById('fidget-container'));
     document.getElementById('shared-components').appendChild(document.getElementById('lifeline-container'));
+    
+    resetLifelineBtn('fifty', 'll-fifty', '50/50');
+    resetLifelineBtn('phone', 'll-phone', 'Phone a Friend');
+    resetLifelineBtn('aud', 'll-aud', 'Ask Audience');
+    State.lifelines = { fifty: false, phone: false, aud: false };
 }
 
 function injectSharedUI(containerId) {
     let container = document.getElementById(containerId);
     container.appendChild(document.getElementById('lifeline-container'));
     container.appendChild(document.getElementById('fidget-container'));
-    State.lifelines = { fifty: false, phone: false, audience: false };
-    document.querySelectorAll('.lifeline-btn').forEach(btn => btn.disabled = false);
+    State.lifelines = { fifty: false, phone: false, aud: false };
+    resetLifelineBtn('fifty', 'll-fifty', '50/50');
+    resetLifelineBtn('phone', 'll-phone', 'Phone a Friend');
+    resetLifelineBtn('aud', 'll-aud', 'Ask Audience');
 }
 
 function resetFidget() {
@@ -822,7 +849,7 @@ function startGame(id, isRanked) {
 }
 
 function restartGame() {
-    if(State.activeGame !== null) startGame(State.activeGame, State.isRanked);
+    if(State.activeGame !== null) { cleanupGameEnv(); startGame(State.activeGame, State.isRanked); }
 }
 
 function getCorrectTarget() {
@@ -831,16 +858,44 @@ function getCorrectTarget() {
     if(State.activeGame === 3) return g3CorrectIdx;
     return null;
 }
+
 function resetLifelineUI() {
     document.querySelectorAll('.cat-hidden').forEach(el => el.classList.remove('cat-hidden'));
     document.querySelectorAll('.g3-opt-btn').forEach(el => el.style.visibility = 'visible');
+}
+
+function startCooldown(type, btnId, defaultText) {
+    if(Settings.cheatMode) return;
+    let btn = document.getElementById(btnId);
+    btn.disabled = true;
+    let timeLeft = 30;
+    
+    btn.textContent = `${defaultText} (${timeLeft}s)`;
+    btn.style.background = `linear-gradient(to right, var(--surface-highlight) 0%, rgba(0,0,0,0.5) 0%)`;
+
+    clearInterval(cooldownTimers[type]);
+    cooldownTimers[type] = setInterval(() => {
+        if(State.isPaused) return; 
+        timeLeft--;
+        if(timeLeft <= 0) {
+            clearInterval(cooldownTimers[type]);
+            btn.disabled = false;
+            btn.textContent = defaultText;
+            btn.style.background = ""; 
+            State.lifelines[type] = false;
+        } else {
+            let filledPct = ((30 - timeLeft) / 30) * 100;
+            btn.textContent = `${defaultText} (${timeLeft}s)`;
+            btn.style.background = `linear-gradient(to right, var(--surface-highlight) ${filledPct}%, rgba(0,0,0,0.5) ${filledPct}%)`;
+        }
+    }, 1000);
 }
 
 function useFifty() {
     if(!Settings.cheatMode && State.lifelines.fifty) return;
     if(isLockedOut) return;
     State.lifelines.fifty = true;
-    if(!Settings.cheatMode) document.getElementById('ll-fifty').disabled = true;
+    
     let correct = getCorrectTarget();
     if(State.activeGame === 1 || State.activeGame === 2) {
         let cats = shuffle(["T1D", "RA", "Allergy", "PNH"].filter(c => c !== correct));
@@ -852,13 +907,14 @@ function useFifty() {
         document.getElementById(`g3-opt-${opts[0]}`).style.visibility = 'hidden';
         document.getElementById(`g3-opt-${opts[1]}`).style.visibility = 'hidden';
     }
+    startCooldown('fifty', 'll-fifty', '50/50');
 }
 
 function usePhone() {
     if(!Settings.cheatMode && State.lifelines.phone) return;
     if(isLockedOut) return;
     State.lifelines.phone = true;
-    if(!Settings.cheatMode) document.getElementById('ll-phone').disabled = true;
+    
     document.getElementById('friend-modal').style.display = 'flex';
     document.getElementById('friend-status').textContent = `Calling ${Settings.friendName}...`;
     document.getElementById('friend-close').style.display = 'none';
@@ -870,18 +926,20 @@ function usePhone() {
         document.getElementById('friend-status').textContent = `"${Settings.friendName} says: I'm pretty sure it's ${ansTxt}!"`;
         document.getElementById('friend-close').style.display = 'inline-block';
     }, 2000);
+    
+    startCooldown('phone', 'll-phone', 'Phone a Friend');
 }
 function closeFriend() { document.getElementById('friend-modal').style.display = 'none'; }
 
 function useAudience() {
-    if(!Settings.cheatMode && State.lifelines.audience) return;
+    if(!Settings.cheatMode && State.lifelines.aud) return;
     if(isLockedOut) return;
-    State.lifelines.audience = true;
-    if(!Settings.cheatMode) document.getElementById('ll-aud').disabled = true;
+    State.lifelines.aud = true;
+    
     document.getElementById('audience-modal').style.display = 'flex';
     let chart = document.getElementById('aud-chart'); chart.innerHTML = '';
     let correct = getCorrectTarget();
-    let labels = (State.activeGame === 3) ? ["Opt 1","Opt 2","Opt 3","Opt 4"] : ["T1D", "RA", "Allergy", "PNH"];
+    let labels = (State.activeGame === 3) ?["Opt 1","Opt 2","Opt 3","Opt 4"] :["T1D", "RA", "Allergy", "PNH"];
     let correctIdx = (State.activeGame === 3) ? correct : ["T1D", "RA", "Allergy", "PNH"].indexOf(correct);
     let pcts = [0,0,0,0];
     pcts[correctIdx] = Math.floor(Math.random() * 20) + 60;
@@ -896,10 +954,12 @@ function useAudience() {
         wrap.appendChild(val); wrap.appendChild(bar); wrap.appendChild(lbl); chart.appendChild(wrap);
         setTimeout(() => { bar.style.height = pcts[i]+"%"; }, 100);
     }
+    
+    startCooldown('aud', 'll-aud', 'Ask Audience');
 }
 function closeAudience() { document.getElementById('audience-modal').style.display = 'none'; }
 
-let g1Queue = []; let g1Index = 0;
+let g1Queue =[]; let g1Index = 0;
 function initG1() {
     switchView('view-g1');
     document.getElementById('g1-badge').textContent = State.isRanked ? "Full Mode" : "Practice Mode";
@@ -973,7 +1033,7 @@ function checkG2(cat) {
     } else triggerGlobalLockout("Wrong Diagnosis!");
 }
 
-let g3Stages = []; let g3CurrentTopic = ""; let g3Questions = []; let g3QIdx = 0; let g3StageCount = 1; let g3CorrectIdx = -1;
+let g3Stages = []; let g3CurrentTopic = ""; let g3Questions =[]; let g3QIdx = 0; let g3StageCount = 1; let g3CorrectIdx = -1;
 function initG3() {
     switchView('view-g3');
     document.getElementById('g3-badge').textContent = State.isRanked ? "Full Mode" : "Practice Mode";
