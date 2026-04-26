@@ -48,13 +48,16 @@
         }
         .view-screen.active { display: flex; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
         #unified-grade-panel {
             background: rgba(0,0,0,0.3); border: 2px solid var(--surface-highlight); border-radius: 12px;
             padding: 20px; text-align: center; max-width: 800px; width: 100%; margin: 0 auto 25px auto;
         }
         .grade-highlight { font-size: 2em; font-weight: bold; margin: 10px 0; }
-        .bias-text { color: var(--danger); font-style: italic; font-size: 1.1em; margin-bottom: 15px;}
+        .bias-text { font-style: italic; font-size: 1.1em; margin-bottom: 5px; font-weight: bold;}
+        .bias-reason { font-size: 0.95em; color: var(--text-muted); margin-bottom: 15px; font-style: italic; padding: 0 10%;}
         .clears-badge { background: var(--accent); color: #000; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9em; display: inline-block; margin-bottom: 10px;}
+        
         #main-menu .card-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; width: 100%; max-width: 1050px; margin: 0 auto;
         }
@@ -72,7 +75,6 @@
         .category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; width: 100%; }
         .cat-btn { padding: 20px; font-size: 1.1em; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
         
-        /* Fixed Colors */
         .bg-t1d { background-color: var(--t1d) !important; color: white !important; }
         .bg-ra { background-color: var(--ra) !important; color: white !important; }
         .bg-allergy { background-color: var(--allergy) !important; color: white !important; }
@@ -125,6 +127,11 @@
         .chart-bar { width: 100%; background: var(--accent); border-radius: 4px 4px 0 0; transition: height 1s ease-out; height: 0; }
         .chart-label { margin-top: 10px; font-weight: bold; font-size: 0.9em; text-align: center;}
         .chart-pct { margin-bottom: 5px; font-weight: bold; }
+
+        /* FIXED SLOT MACHINE */
+        #slot-machine { font-size: 1.1em; font-weight: bold; height: 100px; overflow: hidden; background: var(--bg-color); border: 2px solid var(--warning); border-radius: 8px; margin: 20px 0; position: relative; }
+        #slot-strip { display: flex; flex-direction: column; text-align: center; }
+        .slot-item { height: 100px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; padding: 10px; width: 100%; }
     </style>
 </head>
 <body>
@@ -156,6 +163,7 @@
                 <div id="menu-grade-math" style="font-family: monospace; font-size: 1.1em; margin-bottom: 10px;">--</div>
                 <div id="fun-mode-wrap">
                     <div class="bias-text" id="menu-bias-text">Examiner Bias: Active</div>
+                    <div class="bias-reason" id="menu-bias-reason"></div>
                     <button class="btn-ctrl" style="background:var(--warning); color:#000;" onclick="openSlotMachine()">🎰 Bribe Examiner (Reroll Penalty)</button>
                 </div>
             </div>
@@ -298,7 +306,7 @@
     </div>
 
     <div class="modal-bg" id="slot-modal">
-        <div class="modal" style="text-align: center; max-width: 400px; padding:0;">
+        <div class="modal" style="text-align: center; max-width: 500px; padding:0;">
             <div class="modal-header" style="justify-content: center;">
                 <h2 style="color: var(--warning);">🎰 Bribing the Examiner...</h2>
             </div>
@@ -464,15 +472,15 @@ const DATA = {
 
 const BLANKS = {
     T1D:[
-        { q: "Type 1 Diabetes leads to the destruction of insulin-producing pancreatic _____.", a: "beta cells", d: ["alpha cells", "macrophages", "dendritic cells"] },
-        { q: "Autoantigens are initially presented by _____ to naive T cells in the lymph nodes.", a: "dendritic cells", d: ["neutrophils", "B cells", "basophils"] },
-        { q: "Cytotoxic T cells infiltrate the _____ and induce beta cell apoptosis.", a: "islets of Langerhans", d: ["synovial joints", "thyroid follicles", "lymph nodes"] },
+        { q: "Type 1 Diabetes leads to the destruction of insulin-producing pancreatic _____.", a: "beta cells", d:["alpha cells", "macrophages", "dendritic cells"] },
+        { q: "Autoantigens are initially presented by _____ to naive T cells in the lymph nodes.", a: "dendritic cells", d:["neutrophils", "B cells", "basophils"] },
+        { q: "Cytotoxic T cells infiltrate the _____ and induce beta cell apoptosis.", a: "islets of Langerhans", d:["synovial joints", "thyroid follicles", "lymph nodes"] },
         { q: "GADA is measured using _____.", a: "ELISA", d:["Immunofluorescence", "Immunoturbidimetry", "Flow Cytometry"] },
         { q: "Insulin Autoantibodies testing is invalidated by _____.", a: "exogenous insulin therapy", d:["age-dependent positivity", "anti-histamines", "high staffing costs"] }
     ],
     RA:[
         { q: "RA begins with a loss of tolerance to _____.", a: "citrullinated proteins", d:["GPI anchors", "environmental allergens", "insulin"] },
-        { q: "Immune complexes in the synovial fluid mimic a _____ hypersensitivity reaction.", a: "Type III", d: ["Type I", "Type II", "Type IV"] },
+        { q: "Immune complexes in the synovial fluid mimic a _____ hypersensitivity reaction.", a: "Type III", d:["Type I", "Type II", "Type IV"] },
         { q: "Rheumatoid Factor is an _____ autoantibody.", a: "IgM", d:["IgG", "IgA", "IgE"] },
         { q: "Anti-CCP testing boasts high specificity and strongly predicts severe _____.", a: "erosive joint damage", d:["intravascular haemolysis", "bronchoconstriction", "beta cell apoptosis"] },
         { q: "ANA testing via Indirect Immunofluorescence differentiates RA from _____.", a: "Systemic Lupus", d:["Type 1 Diabetes", "Osteoarthritis", "PNH"] }
@@ -497,6 +505,15 @@ const MARKER_REASONS =[
     "Car broke down this morning.", "Wife is cheating on me.", "Nearly lunch time, rushing marking.",
     "I don't like your handwriting.", "My back hurts.", "Spilled coffee on the rubric.",
     "Student didn't format bibliography correctly.", "Too much jargon used.", "Not enough jargon used."
+];
+
+const GOOD_REASONS =[
+    "I'm drunk marking this.", 
+    "Seeing a homeless guy made me feel less worthless.",
+    "My dog fell asleep on my lap while I was grading.",
+    "Won a £50 scratchcard on my lunch break.",
+    "Accidentally graded the rubric instead of your paper.",
+    "I just don't care anymore, have some marks."
 ];
 
 let State = {
@@ -556,6 +573,8 @@ function loadData() {
         let p = JSON.parse(st);
         State.scores = p.scores || { g1: null, g2: null, g3: null };
         State.timeSeconds = p.timeSeconds || 0;
+        State.markerPenalty = p.markerPenalty || 0;
+        State.markerReason = p.markerReason || "";
     }
     document.getElementById('menu-score-g1').textContent = State.scores.g1 !== null ? `${State.scores.g1}%` : "--%";
     document.getElementById('menu-score-g2').textContent = State.scores.g2 !== null ? `${State.scores.g2}%` : "--%";
@@ -564,7 +583,12 @@ function loadData() {
 
 function saveData() {
     localStorage.setItem('immunoSetV7', JSON.stringify(Settings));
-    localStorage.setItem('immunoStateV7', JSON.stringify({ scores: State.scores, timeSeconds: State.timeSeconds }));
+    localStorage.setItem('immunoStateV7', JSON.stringify({ 
+        scores: State.scores, 
+        timeSeconds: State.timeSeconds,
+        markerPenalty: State.markerPenalty,
+        markerReason: State.markerReason
+    }));
 }
 
 function resetAll() {
@@ -573,6 +597,7 @@ function resetAll() {
         State.scores = { g1: null, g2: null, g3: null };
         State.timeSeconds = 0;
         State.markerPenalty = 0;
+        State.markerReason = "";
         document.getElementById('global-time').textContent = `00:00`;
         loadData(); updateMenuHUD();
         document.getElementById('fun-mode-panel')?.style.setProperty('display', 'none');
@@ -607,10 +632,36 @@ function updateMenuHUD() {
         if(State.scores.g1 !== null) totalScore += State.scores.g1;
         if(State.scores.g2 !== null) totalScore += State.scores.g2;
         if(State.scores.g3 !== null) totalScore += State.scores.g3;
+        
         let base = Math.round(totalScore / clears);
         let pen = Settings.funModeEnabled ? State.markerPenalty : 0;
-        let final = base - pen; if(final < 0) final = 0;
-        document.getElementById('menu-grade-math').innerHTML = `Base ${base}% <span style="color:var(--danger)">- Bias ${pen}%</span> = ${final}%`;
+        let final = base - pen; 
+        
+        if(final < 0) final = 0;
+        if(final > 100) final = 100;
+
+        let mathEl = document.getElementById('menu-grade-math');
+        let biasTxt = document.getElementById('menu-bias-text');
+        let reasonTxt = document.getElementById('menu-bias-reason');
+        
+        if(pen > 0) {
+            mathEl.innerHTML = `Base ${base}% <span style="color:var(--danger)">- Bias ${pen}%</span> = ${final}%`;
+            biasTxt.textContent = `Examiner Bias: -${pen}%`;
+            biasTxt.style.color = "var(--danger)";
+            reasonTxt.textContent = `"${State.markerReason}"`;
+        } else if (pen < 0) {
+            let bonus = Math.abs(pen);
+            mathEl.innerHTML = `Base ${base}% <span style="color:var(--success)">+ Bonus ${bonus}%</span> = ${final}%`;
+            biasTxt.textContent = `Examiner Bias: +${bonus}%`;
+            biasTxt.style.color = "var(--success)";
+            reasonTxt.textContent = `"${State.markerReason}"`;
+        } else {
+            mathEl.innerHTML = `Base ${base}% - Bias 0% = ${final}%`;
+            biasTxt.textContent = `Examiner Bias: Active`;
+            biasTxt.style.color = "var(--danger)";
+            reasonTxt.textContent = ``;
+        }
+
         let classEl = document.getElementById('menu-grade-class');
         if(final >= 70) { classEl.textContent = "1st Class Predicted"; classEl.style.color = "var(--success)"; }
         else if(final >= 60) { classEl.textContent = "2:1 (Upper Second) Predicted"; classEl.style.color = "var(--t1d)"; }
@@ -623,8 +674,6 @@ function updateMenuHUD() {
 function generateMarkerPenalty() {
     State.markerPenalty = Math.floor(Math.random() * 30) + 1;
     State.markerReason = MARKER_REASONS[Math.floor(Math.random() * MARKER_REASONS.length)];
-    let mb = document.getElementById('menu-bias-text');
-    if(mb) mb.textContent = `Examiner Bias: -${State.markerPenalty}%`;
     updateMenuHUD();
 }
 
@@ -751,14 +800,21 @@ function handleSecretSpam(isCorrect) {
     if(!isCorrect) { secretSpamCount = 0; return; }
     secretSpamCount++;
     if(secretSpamCount >= 5) {
-        isLockedOut = false; secretSpamCount = 0; resetFidget();
+        secretSpamCount = 0; 
         clearInterval(lockoutTimerInterval);
-        document.querySelectorAll('.game-container').forEach(el => el.classList.remove('locked-out'));
+        
         let banner = document.getElementById('bottom-penalty-banner');
         banner.style.background = "var(--success)";
-        document.getElementById('penalty-banner-msg').textContent = "Skipped penalty!";
+        document.getElementById('penalty-banner-msg').textContent = "Skipped penalty! Unlocking...";
         document.getElementById('penalty-banner-timer').textContent = "0";
-        setTimeout(() => { banner.style.display = 'none'; }, 1000);
+        
+        // 500ms delay before completely unlocking the inputs
+        setTimeout(() => {
+            isLockedOut = false; 
+            resetFidget();
+            document.querySelectorAll('.game-container').forEach(el => el.classList.remove('locked-out'));
+            banner.style.display = 'none';
+        }, 500);
     }
 }
 
@@ -814,33 +870,59 @@ function openSlotMachine() {
     playSound('reroll');
     document.getElementById('slot-modal').style.display = 'flex';
     document.getElementById('slot-close-btn').style.display = 'none';
+    
     let strip = document.getElementById('slot-strip');
-    strip.style.transform = 'translateY(0px)'; strip.style.transition = 'none'; strip.innerHTML = '';
-    let newPen = Math.floor(Math.random() * 30) + 1;
-    let newReason = MARKER_REASONS[Math.floor(Math.random() * MARKER_REASONS.length)];
+    strip.style.transform = 'translateY(0px)'; 
+    strip.style.transition = 'none'; 
+    strip.innerHTML = '';
+    
+    let isGood = Math.random() < 0.01; // 1% chance for positive outcome
+    let newPen, newReason;
+    
+    if(isGood) {
+        newPen = -(Math.floor(Math.random() * 15) + 5); // Random bonus between 5% and 20%
+        newReason = GOOD_REASONS[Math.floor(Math.random() * GOOD_REASONS.length)];
+    } else {
+        newPen = Math.floor(Math.random() * 30) + 1; // 1 to 30 penalty
+        newReason = MARKER_REASONS[Math.floor(Math.random() * MARKER_REASONS.length)];
+    }
+    
     for(let i=0; i<20; i++) {
         let d = document.createElement('div'); d.className = 'slot-item';
-        if(i === 19) { d.textContent = `-${newPen}%: ${newReason}`; d.style.color = "var(--danger)"; }
-        else { d.textContent = `-${Math.floor(Math.random()*30)+1}%: Spinning...`; }
+        if(i === 19) { 
+            let txt = newPen < 0 ? `+${Math.abs(newPen)}%: ${newReason}` : `-${newPen}%: ${newReason}`;
+            d.textContent = txt;
+            d.style.color = newPen < 0 ? "var(--success)" : "var(--danger)";
+        }
+        else { 
+            let randP = Math.floor(Math.random()*30)+1;
+            let randR = MARKER_REASONS[Math.floor(Math.random() * MARKER_REASONS.length)];
+            d.textContent = `-${randP}%: ${randR}`; 
+        }
         strip.appendChild(d);
     }
+    
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            strip.style.transition = 'transform 2.5s cubic-bezier(0.1, 1, 0.2, 1)';
+            strip.style.transform = `translateY(-${19 * 100}px)`; // Shift up by 19 slots (100px each)
+        });
+    });
+    
     setTimeout(() => {
-        strip.style.transition = 'transform 2.5s cubic-bezier(0.1, 1, 0.2, 1)';
-        strip.style.transform = `translateY(-${19 * 60}px)`;
-    }, 50);
-    setTimeout(() => {
-        State.markerPenalty = newPen; State.markerReason = newReason;
-        let mb = document.getElementById('menu-bias-text');
-        if(mb) mb.textContent = `Examiner Bias: -${State.markerPenalty}%`;
+        State.markerPenalty = newPen; 
+        State.markerReason = newReason;
         updateMenuHUD();
+        saveData(); // Save the new outcome
         document.getElementById('slot-close-btn').style.display = 'inline-block';
     }, 2600);
 }
+
 function closeSlot() { document.getElementById('slot-modal').style.display = 'none'; }
 
 function shuffle(arr) {
     let a = [...arr];
-    for(let i=a.length-1; i>0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a;
+    for(let i=a.length-1; i>0; i--){ const j = Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]; } return a;
 }
 function calculateScore(total, mistakes) {
     return Math.max(0, Math.round(((total - mistakes) / total) * 100));
