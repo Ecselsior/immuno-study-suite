@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Immunopathology Study Suite Ultimate</title>
+    <style>
+        :root {
+            --bg-color: #0f172a; --surface-color: #1e293b; --surface-highlight: #334155;
+            --text-main: #f8fafc; --text-muted: #94a3b8;
+            --accent: #38bdf8; --accent-hover: #0284c7;
+            --success: #22c55e; --warning: #f59e0b; --danger: #ef4444;
+            --t1d: #3b82f6; --ra: #8b5cf6; --allergy: #10b981; --pnh: #f97316;
+            --font-main: 'Segoe UI', system-ui, sans-serif;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: var(--font-main); background-color: var(--bg-color); color: var(--text-main);
+            margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+        }
+        #bottom-penalty-banner {
+            display: none; position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--danger); color: white; text-align: center;
+            padding: 12px 20px; font-size: 1.2em; font-weight: bold;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.5); z-index: 2000; transition: background 0.3s;
+        }
+        #global-hud {
+            background-color: var(--surface-color); border-bottom: 2px solid var(--surface-highlight);
+            padding: 12px 20px; display: flex; justify-content: space-between; align-items: center;
+            z-index: 1000; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5); flex-wrap: wrap; gap: 10px;
+        }
+        .hud-left, .hud-right { display: flex; align-items: center; gap: 15px; }
+        .hud-item { background: rgba(0,0,0,0.3); padding: 6px 14px; border-radius: 6px; font-weight: bold; font-size: 0.95em; text-align: center; }
+        .hud-item span { color: var(--accent); }
+        .btn-ctrl {
+            background: var(--surface-highlight); color: var(--text-main);
+            border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold;
+            transition: 0.2s; font-size: 0.9em;
+        }
+        .btn-ctrl:hover { background: var(--accent); color: #fff; }
+        .btn-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-danger:hover { background: var(--danger); color: white; }
+        .btn-warning { background: rgba(245, 158, 11, 0.2); color: var(--warning); border: 1px solid var(--warning); }
+        .btn-warning:hover { background: var(--warning); color: white; }
+        .view-screen {
+            display: none; flex: 1; overflow-y: auto; padding: 20px;
+            align-items: center; justify-content: center; flex-direction: column; width: 100%;
+        }
+        .view-screen.active { display: flex; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        #unified-grade-panel {
+            background: rgba(0,0,0,0.3); border: 2px solid var(--surface-highlight); border-radius: 12px;
+            padding: 20px; text-align: center; max-width: 800px; width: 100%; margin: 0 auto 25px auto;
+        }
+        .grade-highlight { font-size: 2em; font-weight: bold; margin: 10px 0; }
+        .bias-text { color: var(--danger); font-style: italic; font-size: 1.1em; margin-bottom: 15px;}
+        .clears-badge { background: var(--accent); color: #000; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9em; display: inline-block; margin-bottom: 10px;}
+        #main-menu .card-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; width: 100%; max-width: 1050px; margin: 0 auto;
+        }
+        .menu-card {
+            background: var(--surface-color); border: 1px solid var(--surface-highlight); border-radius: 12px;
+            padding: 25px; text-align: center; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
+        }
+        .menu-card h2 { margin-top: 0; color: var(--accent); }
+        .launch-options { display: flex; gap: 10px; margin-top: 15px; justify-content: center;}
+        .launch-options button { flex: 1; background: var(--surface-highlight); color: #fff; padding: 10px; border: 1px solid var(--surface-highlight); border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9em; transition: 0.2s;}
+        .launch-options button:hover { background: var(--accent); border-color: var(--accent); }
+        .game-container { width: 100%; max-width: 900px; background: var(--surface-color); border-radius: 12px; padding: 30px; position: relative; margin: auto; box-shadow: 0 10px 20px rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center;}
+        .game-container > div { width: 100%; }
+        
+        .category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; width: 100%; }
+        .cat-btn { padding: 20px; font-size: 1.1em; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        
+        /* Fixed Colors */
+        .bg-t1d { background-color: var(--t1d) !important; color: white !important; }
+        .bg-ra { background-color: var(--ra) !important; color: white !important; }
+        .bg-allergy { background-color: var(--allergy) !important; color: white !important; }
+        .bg-pnh { background-color: var(--pnh) !important; color: white !important; }
+        
+        .locked-out .cat-btn, .locked-out .g3-opt-btn { opacity: 0.4; filter: grayscale(100%); cursor: not-allowed; }
+        .cat-btn:active:not(:disabled) { transform: scale(0.97); }
+        .cat-hidden { visibility: hidden; pointer-events: none; }
+        
+        #g1-active-item { background: var(--surface-highlight); padding: 30px; border-radius: 10px; font-size: 1.4em; text-align: center; font-weight: bold; min-height: 100px; display: flex; align-items: center; justify-content: center;}
+        #g2-board { background: rgba(0,0,0,0.2); border: 2px dashed var(--surface-highlight); border-radius: 8px; padding: 20px; display: flex; flex-wrap: wrap; gap: 10px; min-height: 200px; max-height: 300px; overflow-y: auto; align-content: flex-start;}
+        .keyword-chip { background: var(--surface-highlight); color: var(--accent); padding: 8px 14px; border-radius: 20px; font-size: 0.9em; border: 1px solid var(--accent); animation: popIn 0.2s; }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        
+        #g3-question { font-size: 1.3em; line-height: 1.6; margin-bottom: 30px; text-align: center; }
+        .blank-space { border-bottom: 3px solid var(--accent); color: var(--accent); padding: 0 15px; font-weight: bold; }
+        .g3-options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
+        .g3-opt-btn { background: var(--surface-highlight); border: 2px solid #475569; color: white; padding: 15px; font-size: 1.1em; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s;}
+        .g3-opt-btn:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); }
+        
+        .modal-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 6000; }
+        .modal { background: var(--surface-color); border-radius: 12px; width: 90%; max-width: 600px; border: 1px solid var(--surface-highlight); display: flex; flex-direction: column; max-height: 90vh; }
+        .modal-header { position: sticky; top: 0; background: var(--surface-color); padding: 20px 30px; border-bottom: 1px solid var(--surface-highlight); display: flex; justify-content: space-between; align-items: center; border-radius: 12px 12px 0 0; z-index: 10;}
+        .modal-header h2 { margin: 0; color: var(--accent); }
+        .modal-body { padding: 30px; overflow-y: auto; }
+        .modal-close { background: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1em;}
+        .modal-close:hover { background: var(--accent-hover); }
+        .setting-row { display: flex; justify-content: space-between; margin-bottom: 15px; align-items: center; }
+        .setting-row input[type="number"], .setting-row input[type="text"] { background: var(--bg-color); color: white; border: 1px solid var(--surface-highlight); border-radius: 4px; padding: 5px 10px; width: 120px;}
+        .model-q { background: rgba(255,255,255,0.05); padding: 15px; border-left: 4px solid var(--warning); margin-bottom: 20px; font-style: italic; font-size: 0.95em; line-height: 1.5;}
+        .model-topic { color: var(--accent); margin-top: 25px; border-bottom: 1px solid var(--surface-highlight); padding-bottom: 5px;}
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85em; }
+        th, td { border: 1px solid var(--surface-highlight); padding: 8px; text-align: left; }
+        th { background-color: var(--accent); color: var(--bg-color); }
+        
+        #fidget-container { display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--surface-highlight); padding: 10px 20px; border-radius: 50px; border: 2px solid var(--danger); margin-top: 20px; width: fit-content; }
+        #fidget-time { font-weight: bold; font-size: 1.5em; min-width: 35px; text-align: center;}
+        #fidget-btn { background: var(--danger); color: white; border: none; border-radius: 20px; padding: 8px 20px; font-weight: bold; font-size: 1.1em; cursor: pointer; box-shadow: 0 4px 0 #991b1b; }
+        #fidget-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #991b1b; }
+        .urgent { color: var(--danger) !important; animation: pulse 0.5s infinite alternate; }
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+        
+        #lifeline-container { display: flex; gap: 10px; width: 100%; justify-content: center; margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--surface-highlight); }
+        .lifeline-btn { background: var(--surface-highlight); color: var(--text-main); border: 1px solid var(--accent); border-radius: 6px; padding: 10px 15px; font-weight: bold; cursor: pointer; flex: 1; max-width: 150px; transition: 0.2s; }
+        .lifeline-btn:hover:not(:disabled) { background: var(--accent); color: #fff; }
+        .lifeline-btn:disabled { opacity: 0.8; cursor: not-allowed; border-color: var(--text-muted); color: var(--text-muted); }
+        
+        .chart-container { display: flex; align-items: flex-end; justify-content: space-around; height: 200px; border-bottom: 2px solid var(--text-main); border-left: 2px solid var(--text-main); padding: 10px 10px 0 10px; margin-top: 20px; }
+        .chart-bar-wrap { display: flex; flex-direction: column; align-items: center; width: 20%; height: 100%; justify-content: flex-end; }
+        .chart-bar { width: 100%; background: var(--accent); border-radius: 4px 4px 0 0; transition: height 1s ease-out; height: 0; }
+        .chart-label { margin-top: 10px; font-weight: bold; font-size: 0.9em; text-align: center;}
+        .chart-pct { margin-bottom: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="bottom-penalty-banner">
+        ⚠️ SYSTEM LOCKED: <span id="penalty-banner-msg">Incorrect!</span> | Timer: <span id="penalty-banner-timer">10</span>s
+    </div>
+
+    <div id="global-hud">
+        <div class="hud-left">
+            <div class="hud-item" style="font-size: 1.1em;">⏱️ <span id="global-time">00:00</span></div>
+        </div>
+        <div class="hud-right">
+            <button class="btn-ctrl btn-warning" onclick="restartGame()" id="restart-btn" style="display:none;">↻ Restart</button>
+            <button class="btn-ctrl btn-danger" onclick="exitGameNoSave()" id="exit-nosave-btn" style="display:none;">🚪 Exit (No Save)</button>
+            <button class="btn-ctrl" onclick="saveAndMenu()" id="exit-save-btn" style="display:none;">🏠 Save & Exit</button>
+            <button class="btn-ctrl" onclick="showCheatSheet()">📖 Model Answers</button>
+            <button class="btn-ctrl" onclick="openSettings()">⚙️ Settings</button>
+        </div>
+    </div>
+
+    <div id="view-menu" class="view-screen active">
+        <h1 style="margin-top: 0;">Immunopathology Diagnostics</h1>
+        <div id="unified-grade-panel">
+            <div class="clears-badge" id="menu-clears">Full Clears: 0 / 3</div>
+            <div id="grade-content">
+                <div style="font-size: 1.1em; color: var(--text-muted);">Predicted Global Grade</div>
+                <div class="grade-highlight" id="menu-grade-class">Play Full Games to Generate</div>
+                <div id="menu-grade-math" style="font-family: monospace; font-size: 1.1em; margin-bottom: 10px;">--</div>
+                <div id="fun-mode-wrap">
+                    <div class="bias-text" id="menu-bias-text">Examiner Bias: Active</div>
+                    <button class="btn-ctrl" style="background:var(--warning); color:#000;" onclick="openSlotMachine()">🎰 Bribe Examiner (Reroll Penalty)</button>
+                </div>
+            </div>
+        </div>
+        <div class="card-grid">
+            <div class="menu-card">
+                <h2>1. Keyword Match</h2>
+                <p>Sort key phrases to their correct conditions.</p>
+                <div class="hud-item" style="margin:10px auto; width:fit-content;">Best Full: <span id="menu-score-g1">--%</span></div>
+                <div class="launch-options">
+                    <button onclick="startGame(1, false)">Practice (25%)</button>
+                    <button onclick="startGame(1, true)">Full (100%)</button>
+                </div>
+            </div>
+            <div class="menu-card">
+                <h2>2. Decay Mode</h2>
+                <p>Information halves progressively. Hardcore recall.</p>
+                <div class="hud-item" style="margin:10px auto; width:fit-content;">Best Full: <span id="menu-score-g2">--%</span></div>
+                <div class="launch-options">
+                    <button onclick="startGame(2, false)">Practice (25%)</button>
+                    <button onclick="startGame(2, true)">Full (100%)</button>
+                </div>
+            </div>
+            <div class="menu-card">
+                <h2>3. Fill in the Blanks</h2>
+                <p>Reconstruct the complete model answers.</p>
+                <div class="hud-item" style="margin:10px auto; width:fit-content;">Best Full: <span id="menu-score-g3">--%</span></div>
+                <div class="launch-options">
+                    <button onclick="startGame(3, false)">Practice (25%)</button>
+                    <button onclick="startGame(3, true)">Full (100%)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-g1" class="view-screen">
+        <div class="game-container" id="g1-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin:0;">Keyword Match <span id="g1-badge" style="font-size:0.6em; background:var(--surface-highlight); padding: 5px 10px; border-radius:10px; vertical-align:middle; margin-left:10px;">Full</span></h2>
+                <span id="g1-progress" style="color:var(--text-muted); font-weight:bold;">Item: 0/0</span>
+            </div>
+            <div id="g1-active-item">Loading...</div>
+            <div class="category-grid" id="g1-grid">
+                <button class="cat-btn bg-t1d" id="g1-btn-t1d" onclick="checkG1('T1D')">Type 1 Diabetes</button>
+                <button class="cat-btn bg-ra" id="g1-btn-ra" onclick="checkG1('RA')">Rheumatoid Arthritis</button>
+                <button class="cat-btn bg-allergy" id="g1-btn-allergy" onclick="checkG1('Allergy')">Allergic Disorders</button>
+                <button class="cat-btn bg-pnh" id="g1-btn-pnh" onclick="checkG1('PNH')">PNH</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-g2" class="view-screen">
+        <div class="game-container" id="g2-container" style="max-width: 1000px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="margin:0;">Decay Mode <span id="g2-badge" style="font-size:0.6em; background:var(--surface-highlight); padding: 5px 10px; border-radius:10px; vertical-align:middle; margin-left:10px;">Full</span></h2>
+                <div style="color: var(--text-muted); font-weight:bold; display:flex; gap:20px;">
+                    <span>Level: <strong id="g2-lvl" style="color:var(--accent)">1</strong> / <span id="g2-max-lvl">7</span></span>
+                    <span>Info Shown: <strong id="g2-pct" style="color:var(--accent)">50%</strong></span>
+                    <span>Question: <strong id="g2-q">1/4</strong></span>
+                </div>
+            </div>
+            <div id="g2-board"></div>
+            <div class="category-grid" id="g2-grid">
+                <button class="cat-btn bg-t1d" id="g2-btn-t1d" onclick="checkG2('T1D')">Type 1 Diabetes</button>
+                <button class="cat-btn bg-ra" id="g2-btn-ra" onclick="checkG2('RA')">Rheumatoid Arthritis</button>
+                <button class="cat-btn bg-allergy" id="g2-btn-allergy" onclick="checkG2('Allergy')">Allergic Disorders</button>
+                <button class="cat-btn bg-pnh" id="g2-btn-pnh" onclick="checkG2('PNH')">PNH</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-g3" class="view-screen">
+        <div class="game-container" id="g3-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin:0;">Fill in the Blanks <span id="g3-badge" style="font-size:0.6em; background:var(--surface-highlight); padding: 5px 10px; border-radius:10px; vertical-align:middle; margin-left:10px;">Full</span></h2>
+                <div style="color: var(--text-muted); font-weight:bold; display:flex; gap:20px;">
+                    <span>Stage: <strong id="g3-stage" style="color:var(--accent)">1/4</strong> <span id="g3-topic"></span></span>
+                    <span>Progress: <strong id="g3-progress" style="color:var(--accent)">0/0</strong></span>
+                </div>
+            </div>
+            <div id="g3-question">Question goes here...</div>
+            <div class="g3-options">
+                <button class="g3-opt-btn" id="g3-opt-0" onclick="checkG3(0)">Option 1</button>
+                <button class="g3-opt-btn" id="g3-opt-1" onclick="checkG3(1)">Option 2</button>
+                <button class="g3-opt-btn" id="g3-opt-2" onclick="checkG3(2)">Option 3</button>
+                <button class="g3-opt-btn" id="g3-opt-3" onclick="checkG3(3)">Option 4</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="shared-components" style="display:none;">
+        <div id="lifeline-container">
+            <button class="lifeline-btn" id="ll-fifty" onclick="useFifty()">50/50</button>
+            <button class="lifeline-btn" id="ll-phone" onclick="usePhone()">Phone a Friend</button>
+            <button class="lifeline-btn" id="ll-aud" onclick="useAudience()">Ask Audience</button>
+        </div>
+        <div id="fidget-container">
+            <span style="font-size: 0.8em; color:var(--text-muted);">SYS:</span>
+            <span id="fidget-time">30</span>
+            <button id="fidget-btn" onclick="hitFidget()">CLICK</button>
+        </div>
+    </div>
+
+    <div class="modal-bg" id="settings-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>⚙️ System Settings</h2>
+                <button class="modal-close" onclick="saveSettings()">Save & Close</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-row">
+                    <label>Global Penalty Time (s):</label>
+                    <input type="number" id="set-pen" min="1" max="120">
+                </div>
+                <div class="setting-row">
+                    <label>Lifeline Cooldown (s):</label>
+                    <input type="number" id="set-cooldown" min="5" max="120">
+                </div>
+                <div class="setting-row">
+                    <label>Friend Name (Lifeline):</label>
+                    <input type="text" id="set-friend" maxlength="15">
+                </div>
+                <div class="setting-row">
+                    <label>Enable Fidget Toy:</label>
+                    <input type="checkbox" id="set-fidget">
+                </div>
+                <div class="setting-row" style="border-top: 1px solid var(--surface-highlight); padding-top: 15px;">
+                    <label style="color: var(--warning); font-weight: bold;">Enable Examiner Bias:</label>
+                    <input type="checkbox" id="set-fun">
+                </div>
+                <div class="setting-row">
+                    <label style="color: var(--accent); font-weight: bold;">Cheat Mode (Unlimited Lifelines):</label>
+                    <input type="checkbox" id="set-cheat">
+                </div>
+                <div style="border-top: 1px solid var(--surface-highlight); padding-top: 15px; margin-top: 15px; text-align: center;">
+                    <button class="btn-ctrl btn-danger" onclick="resetAll()" style="width: 100%; padding: 12px;">🗑 Reset All Game Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-bg" id="slot-modal">
+        <div class="modal" style="text-align: center; max-width: 400px; padding:0;">
+            <div class="modal-header" style="justify-content: center;">
+                <h2 style="color: var(--warning);">🎰 Bribing the Examiner...</h2>
+            </div>
+            <div class="modal-body">
+                <div id="slot-machine">
+                    <div id="slot-strip"></div>
+                </div>
+                <button class="modal-close" id="slot-close-btn" style="display:none; width:100%; margin-top:20px;" onclick="closeSlot()">Accept Fate</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-bg" id="cheat-modal">
+        <div class="modal" style="max-width: 900px; padding:0;">
+            <div class="modal-header">
+                <h2>📖 Model Answers</h2>
+                <button class="modal-close" onclick="closeCheatSheet()">Close Guide</button>
+            </div>
+            <div class="modal-body">
+                <div class="model-q">
+                    <strong>Q1.</strong> Act as a clinical immunologist tasked with diagnosing a patient with either Type 1 Diabetes OR Rheumatoid Arthritis. Write a comprehensive report that describes the immunopathobiology of your chosen disease and critically evaluates at least three common immunological tests used for its diagnosis.
+                </div>
+                <h3 class="model-topic">Type 1 Diabetes Answer</h3>
+                <p>Organ-specific autoimmune disease characterised by the breakdown of self-tolerance, leading to the destruction of insulin-producing pancreatic beta cells. Dendritic cells present autoantigens to naive T cells in pancreatic lymph nodes. CD4+ Th1 cells secrete inflammatory cytokines, activating macrophages and CD8+ cytotoxic T lymphocytes. CD8+ cells infiltrate the islets of Langerhans inducing apoptosis. B cells produce autoantibodies (biomarkers).</p>
+                <table>
+                    <tr><th>Diagnostic Test</th><th>Methodology</th><th>Diagnostic Value</th><th>Primary Limitation</th></tr>
+                    <tr><td>GADA</td><td>ELISA</td><td>High sensitivity in adults</td><td>Expensive reagents, age-dependent positivity</td></tr>
+                    <tr><td>ICA</td><td>Indirect Immunofluorescence</td><td>High specificity, diff. from Type 2</td><td>Subjective interpretation, poor reproducibility</td></tr>
+                    <tr><td>IAA</td><td>Chemiluminescence Immunoassay</td><td>Stages early childhood onset</td><td>Invalidated by exogenous insulin therapy</td></tr>
+                </table>
+                <h3 class="model-topic">Rheumatoid Arthritis Answer</h3>
+                <p>Systemic autoimmune disorder causing chronic joint inflammation. Loss of tolerance to citrullinated proteins forms immune complexes in synovial fluid (Type III hypersensitivity). Antigen-presenting cells activate CD4+ Th1/Th17 cells, secreting TNF-alpha and IL-6. Activates macrophages, fibroblasts, osteoclasts causing hyperplasia and bone erosion.</p>
+                <table>
+                    <tr><th>Diagnostic Test</th><th>Methodology</th><th>Diagnostic Value</th><th>Primary Limitation</th></tr>
+                    <tr><td>Anti-CCP</td><td>ELISA</td><td>High specificity, stages erosive disease</td><td>High reagent and equipment costs</td></tr>
+                    <tr><td>Rheumatoid Factor</td><td>Immunoturbidimetry</td><td>High sensitivity for screening</td><td>High false-positive rate in the elderly</td></tr>
+                    <tr><td>Antinuclear Antibodies (ANA)</td><td>Indirect Immunofluorescence</td><td>Differentiates RA from Lupus</td><td>Extremely low disease specificity</td></tr>
+                </table>
+                <div class="model-q">
+                    <strong>Q2(a).</strong> Discuss the pathophysiology of allergic disorders and critically evaluate the diagnostic tests targeted towards them.
+                </div>
+                <h3 class="model-topic">Allergic Disorders Answer</h3>
+                <p>Type I immediate hypersensitivity. Sensitisation phase: APCs present allergen to Th2 cells (IL-4, IL-13). B cells isotype switch to IgE. IgE binds high-affinity Fc-epsilon-RI on mast cells/basophils. Re-exposure cross-links IgE causing rapid degranulation (histamine/tryptase) causing vasodilation and bronchoconstriction.</p>
+                <table>
+                    <tr><th>Diagnostic Test</th><th>Methodology</th><th>Clinical Utility</th><th>Major Limitation</th></tr>
+                    <tr><td>Skin Prick Test</td><td>In vivo mast cell degranulation</td><td>Immediate physiological results</td><td>Risk of anaphylaxis, affected by anti-histamines</td></tr>
+                    <tr><td>Specific IgE Assay</td><td>In vitro solid-phase immunoassay</td><td>Safe, unaffected by medication</td><td>High cost, detects sensitisation not clinical allergy</td></tr>
+                    <tr><td>Basophil Activation Test</td><td>Flow cytometry (CD63)</td><td>Functional physiological assessment</td><td>Requires fresh blood, lacks standardisation</td></tr>
+                </table>
+                <div class="model-q">
+                    <strong>Q2(b).</strong> With reference to a specific disorder of the complement system, describe a modern monoclonal antibody-based treatment and explain its mechanism of action.
+                </div>
+                <h3 class="model-topic">Paroxysmal Nocturnal Haemoglobinuria (PNH) Answer</h3>
+                <p>Severe complement system disorder causing RBC destruction. Mutation in PIG-A gene in stem cells stops synthesis of GPI anchors. RBCs cannot tether complement regulators CD55 and CD59 to membrane. Unregulated Membrane Attack Complex (MAC) causes lysis.</p>
+                <table>
+                    <tr><th>Disease</th><th>Genetic Defect</th><th>Treatment</th><th>Mechanism of Action</th></tr>
+                    <tr><td>PNH</td><td>Lack of GPI-anchored CD55 and CD59</td><td>Eculizumab</td><td>Binds C5, prevents cleavage to C5b, blocks MAC formation</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-bg" id="game-over-modal">
+        <div class="modal" style="text-align: center; max-width: 400px; padding:0;">
+            <div class="modal-header" style="justify-content: center;">
+                <h2 id="go-title" style="color: var(--accent);">Game Complete!</h2>
+            </div>
+            <div class="modal-body">
+                <div style="font-size: 3em; margin: 10px 0;" id="go-score">100%</div>
+                <div style="color: var(--text-muted); margin-bottom: 20px;" id="go-mistakes">0 Mistakes</div>
+                <button class="modal-close" style="width: 100%; padding: 15px; font-size: 1.1em;" onclick="closeGameOver()">Return to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-bg" id="friend-modal">
+        <div class="modal" style="text-align: center; max-width: 400px; padding:0;">
+            <div class="modal-header" style="justify-content: center;">
+                <h2 style="color: var(--accent);">📱 Phone a Friend</h2>
+            </div>
+            <div class="modal-body">
+                <p id="friend-status" style="font-size: 1.2em; font-weight: bold; min-height: 50px;">Calling...</p>
+                <button class="modal-close" id="friend-close" style="display:none; width: 100%; margin-top: 15px;" onclick="closeFriend()">Thanks!</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-bg" id="audience-modal">
+        <div class="modal" style="text-align: center; max-width: 500px; padding:0;">
+            <div class="modal-header" style="justify-content: center;">
+                <h2 style="color: var(--accent);">📊 Ask the Audience</h2>
+            </div>
+            <div class="modal-body">
+                <div class="chart-container" id="aud-chart"></div>
+                <button class="modal-close" style="width: 100%; margin-top: 25px;" onclick="closeAudience()">Close Poll</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+const AUDIO_BASE = "./audio/";
+const SOUNDS = {
+    start:["usec1_start_01.wav", "usec2_start1.wav", "usec3_start_01.wav", "usec5_start_01.wav", "usec1_ready_01_l.wav", "usec4_ready_01_l.wav"],
+    good:["usec1_goodwork_01_l.wav", "usec2_goodwork_02.wav", "usec3_goodwork_01.wav", "usec4_goodwork_01_l.wav", "usec5_goodwork_01_l.wav", "usec1_roger_01.wav"],
+    bad:["usec1_badwork_01_l.wav", "usec1_negative_01_l.wav", "usec2_badwork1.wav", "usec3_badwork_01_l.wav", "usec4_badwork_01.wav", "usec3_ffire_01.wav"],
+    win:["usec1_session_passed_01.wav", "usec2_session_passed_01.wav", "usec3_session_passed_01.wav", "usec1_fight_end_01.wav"],
+    fidget:["usec1_breath_ok_01.wav", "usec2_breath_ok.wav", "usec3_breath_ok.wav", "usec1_key_01.wav"],
+    reroll:["usec1_canyouhearit_01.wav", "usec3_mutter_01.wav", "usec4_mutter_01.wav"]
+};
+
+function playSound(type) {
+    if(!SOUNDS[type]) return;
+    let list = SOUNDS[type];
+    let file = list[Math.floor(Math.random() * list.length)];
+    try {
+        let audio = new Audio(AUDIO_BASE + file);
+        audio.volume = 0.5;
+        audio.play().catch(e => {});
+    } catch (e) {}
+}
+
+const DATA = {
+    T1D:[
+        "Organ-specific autoimmune disease", "Breakdown of immunological self-tolerance", "Destruction of insulin-producing pancreatic beta cells",
+        "Initial presentation of autoantigens", "Dendritic cells", "Naive T cells in the pancreatic lymph nodes",
+        "Cell-mediated adaptive immune response", "CD4 positive T helper 1 cells", "Secrete inflammatory cytokines",
+        "Activating macrophages", "CD8 positive cytotoxic T lymphocytes", "Infiltrate the islets of Langerhans",
+        "Induce beta cell apoptosis", "B cells produce specific autoantibodies as biomarkers",
+        "Glutamic Acid Decarboxylase 65 (GADA)", "Enzyme-Linked Immunosorbent Assay (ELISA)", "High diagnostic sensitivity", 
+        "Islet Cell Antibodies (ICA)", "Indirect immunofluorescence", "Differentiating from Type 2 Diabetes",
+        "Insulin Autoantibodies (IAA)", "Chemiluminescence immunoassays", "Invalidated by exogenous insulin therapy",
+        "Levy-Jennings charts", "Fasting plasma glucose & HbA1c", "Serum C-peptide"
+    ],
+    RA:[
+        "Systemic autoimmune disorder", "Chronic inflammation and destruction of synovial joints",
+        "Loss of tolerance to citrullinated proteins", "Immune complexes in synovial fluid", "Type III hypersensitivity reaction",
+        "CD4 positive Th1 and Th17 subsets", "Pro-inflammatory cytokines (TNF-alpha and IL-6)",
+        "Promoting osteoclast differentiation", "Synovial hyperplasia and bone erosion",
+        "Rheumatoid Factor (IgM anti-IgG Fc)", "Immunoturbidimetry", "High false-positive rate in the elderly",
+        "Anti-Cyclic Citrullinated Peptide (Anti-CCP)", "Enzyme-Linked Immunosorbent Assay (ELISA)", "Stages severe erosive joint damage",
+        "Antinuclear Antibody screen (ANA)", "Indirect immunofluorescence", "Differentiates RA from Systemic Lupus Erythematosus",
+        "Costly downstream immunoblotting", "C-Reactive Protein (CRP)", "Erythrocyte Sedimentation Rate (ESR)"
+    ],
+    Allergy:[
+        "Type I immediate hypersensitivity reaction", "Innocuous environmental antigens", "Clinically silent sensitisation phase",
+        "T helper 2 cells secrete IL-4 and IL-13", "B cells undergo isotype switching to IgE",
+        "High-affinity Fc-epsilon-RI receptors", "Tissue mast cells and circulating basophils",
+        "Allergen cross-links the bound IgE", "Rapid cellular degranulation", "Histamine and tryptase",
+        "Immediate vasodilation and bronchoconstriction", "In vivo Skin Prick Testing", "Cutaneous mast cell degranulation",
+        "Limited if patient is taking anti-histamine", "In vitro specific IgE immunoassays (Phadia ImmunoCAP)",
+        "Sensitisation does not always equate to clinical reactivity", "Basophil Activation Test (CD63 marker via flow cytometry)",
+        "Logistical requirement for freshly drawn whole blood"
+    ],
+    PNH:[
+        "Severe life-threatening disorder of the complement system", "Continuous uncontrolled destruction of red blood cells",
+        "Acquired genetic mutation in the PIG-A gene", "Haematopoietic stem cells",
+        "Prevents synthesis of glycosylphosphatidylinositol (GPI) anchors", "CD55 (decay accelerator)", "CD59 (C9 blocker)",
+        "Unregulated formation of the Membrane Attack Complex (MAC)", "Eculizumab (recombinant humanised monoclonal antibody)",
+        "Binds specifically to complement protein C5", "Prevents cleavage into active fragments C5a and C5b",
+        "Downstream assembly of C6, C7, C8, and C9 cannot occur", "Directly prevents intravascular haemolysis"
+    ]
+};
+
+const BLANKS = {
+    T1D:[
+        { q: "Type 1 Diabetes leads to the destruction of insulin-producing pancreatic _____.", a: "beta cells", d: ["alpha cells", "macrophages", "dendritic cells"] },
+        { q: "Autoantigens are initially presented by _____ to naive T cells in the lymph nodes.", a: "dendritic cells", d: ["neutrophils", "B cells", "basophils"] },
+        { q: "Cytotoxic T cells infiltrate the _____ and induce beta cell apoptosis.", a: "islets of Langerhans", d: ["synovial joints", "thyroid follicles", "lymph nodes"] },
+        { q: "GADA is measured using _____.", a: "ELISA", d:["Immunofluorescence", "Immunoturbidimetry", "Flow Cytometry"] },
+        { q: "Insulin Autoantibodies testing is invalidated by _____.", a: "exogenous insulin therapy", d:["age-dependent positivity", "anti-histamines", "high staffing costs"] }
+    ],
+    RA:[
+        { q: "RA begins with a loss of tolerance to _____.", a: "citrullinated proteins", d:["GPI anchors", "environmental allergens", "insulin"] },
+        { q: "Immune complexes in the synovial fluid mimic a _____ hypersensitivity reaction.", a: "Type III", d: ["Type I", "Type II", "Type IV"] },
+        { q: "Rheumatoid Factor is an _____ autoantibody.", a: "IgM", d:["IgG", "IgA", "IgE"] },
+        { q: "Anti-CCP testing boasts high specificity and strongly predicts severe _____.", a: "erosive joint damage", d:["intravascular haemolysis", "bronchoconstriction", "beta cell apoptosis"] },
+        { q: "ANA testing via Indirect Immunofluorescence differentiates RA from _____.", a: "Systemic Lupus", d:["Type 1 Diabetes", "Osteoarthritis", "PNH"] }
+    ],
+    Allergy:[
+        { q: "Allergic disorders are driven by a _____ immediate hypersensitivity reaction.", a: "Type I", d:["Type II", "Type III", "Type IV"] },
+        { q: "B cells undergo isotype switching and produce allergen-specific _____.", a: "IgE antibodies", d:["IgG antibodies", "IgM autoantibodies", "IgA antibodies"] },
+        { q: "IgE binds to high-affinity _____ receptors.", a: "Fc-epsilon-RI", d:["CD55", "CD59", "CD63"] },
+        { q: "Skin Prick Testing is limited if the patient is taking _____ medications.", a: "anti-histamine", d:["exogenous insulin", "Eculizumab", "immunosuppressive"] },
+        { q: "The Basophil Activation Test measures the upregulation of _____.", a: "CD63", d:["CD55", "CD59", "C5"] }
+    ],
+    PNH:[
+        { q: "PNH stems from an acquired genetic mutation in the _____.", a: "PIG-A gene", d:["Fc-epsilon-RI receptor", "CD63 marker", "IgE heavy chain"] },
+        { q: "The mutation prevents the synthesis of _____ anchors.", a: "GPI", d:["CD55", "CD59", "C5"] },
+        { q: "Without anchors, erythrocytes lack CD55 and _____, making them susceptible to lysis.", a: "CD59", d:["CD63", "C5a", "C9"] },
+        { q: "Erythrocytes are destroyed by the unregulated formation of the _____.", a: "Membrane Attack Complex", d:["immune complexes", "synovial hyperplasia", "islets of Langerhans"] },
+        { q: "Eculizumab functions by binding specifically to complement protein _____.", a: "C5", d:["C3", "C9", "CD55"] }
+    ]
+};
+
+const MARKER_REASONS =[
+    "Car broke down this morning.", "Wife is cheating on me.", "Nearly lunch time, rushing marking.",
+    "I don't like your handwriting.", "My back hurts.", "Spilled coffee on the rubric.",
+    "Student didn't format bibliography correctly.", "Too much jargon used.", "Not enough jargon used."
+];
+
+let State = {
+    timeSeconds: 0,
+    scores: { g1: null, g2: null, g3: null },
+    markerPenalty: 0,
+    markerReason: "",
+    isPaused: false,
+    activeGame: null,
+    isRanked: false,
+    lifelines: { fifty: false, phone: false, aud: false }
+};
+
+let currentTotalQs = 0;
+let currentMistakes = 0;
+let secretSpamCount = 0;
+
+let Settings = {
+    penalty: 10,
+    lifelineCooldown: 30,
+    fidgetEnabled: true,
+    funModeEnabled: true,
+    friendName: "Kalhara",
+    cheatMode: false
+};
+
+let globalTimerInterval;
+let fidgetInterval;
+let lockoutTimerInterval;
+let fidgetTime = 30;
+let isLockedOut = false;
+let currentPenaltyTimeLeft = 0;
+let cooldownTimers = { fifty: null, phone: null, aud: null };
+
+function init() {
+    loadData();
+    updateMenuHUD();
+    let clears = getClears();
+    if(clears > 0 && Settings.funModeEnabled) generateMarkerPenalty();
+    else document.getElementById('fun-mode-panel')?.style.setProperty('display', 'none');
+    
+    globalTimerInterval = setInterval(() => {
+        if(!State.isPaused && State.activeGame) {
+            State.timeSeconds++;
+            let m = Math.floor(State.timeSeconds / 60).toString().padStart(2, '0');
+            let s = (State.timeSeconds % 60).toString().padStart(2, '0');
+            document.getElementById('global-time').textContent = `${m}:${s}`;
+        }
+    }, 1000);
+}
+
+function loadData() {
+    let s = localStorage.getItem('immunoSetV7');
+    let st = localStorage.getItem('immunoStateV7');
+    if(s) Settings = Object.assign(Settings, JSON.parse(s));
+    if(st) {
+        let p = JSON.parse(st);
+        State.scores = p.scores || { g1: null, g2: null, g3: null };
+        State.timeSeconds = p.timeSeconds || 0;
+    }
+    document.getElementById('menu-score-g1').textContent = State.scores.g1 !== null ? `${State.scores.g1}%` : "--%";
+    document.getElementById('menu-score-g2').textContent = State.scores.g2 !== null ? `${State.scores.g2}%` : "--%";
+    document.getElementById('menu-score-g3').textContent = State.scores.g3 !== null ? `${State.scores.g3}%` : "--%";
+}
+
+function saveData() {
+    localStorage.setItem('immunoSetV7', JSON.stringify(Settings));
+    localStorage.setItem('immunoStateV7', JSON.stringify({ scores: State.scores, timeSeconds: State.timeSeconds }));
+}
+
+function resetAll() {
+    if(confirm("Are you sure you want to wipe all progress?")) {
+        localStorage.removeItem('immunoStateV7');
+        State.scores = { g1: null, g2: null, g3: null };
+        State.timeSeconds = 0;
+        State.markerPenalty = 0;
+        document.getElementById('global-time').textContent = `00:00`;
+        loadData(); updateMenuHUD();
+        document.getElementById('fun-mode-panel')?.style.setProperty('display', 'none');
+        document.getElementById('settings-modal').style.display = 'none';
+        if(State.activeGame) saveAndMenu();
+    }
+}
+
+function getClears() {
+    let c = 0;
+    if(State.scores.g1 !== null) c++;
+    if(State.scores.g2 !== null) c++;
+    if(State.scores.g3 !== null) c++;
+    return c;
+}
+
+function updateMenuHUD() {
+    let clears = getClears();
+    document.getElementById('menu-clears').textContent = `Full Clears: ${clears} / 3`;
+    if(clears === 0) {
+        document.getElementById('menu-grade-class').textContent = "Play Full Games to Generate";
+        document.getElementById('menu-grade-class').style.color = "var(--text-muted)";
+        document.getElementById('menu-grade-math').textContent = "--";
+        document.getElementById('fun-mode-wrap').style.display = 'none';
+    } else {
+        if(Settings.funModeEnabled) {
+            document.getElementById('fun-mode-wrap').style.display = 'block';
+        } else {
+            document.getElementById('fun-mode-wrap').style.display = 'none';
+        }
+        let totalScore = 0;
+        if(State.scores.g1 !== null) totalScore += State.scores.g1;
+        if(State.scores.g2 !== null) totalScore += State.scores.g2;
+        if(State.scores.g3 !== null) totalScore += State.scores.g3;
+        let base = Math.round(totalScore / clears);
+        let pen = Settings.funModeEnabled ? State.markerPenalty : 0;
+        let final = base - pen; if(final < 0) final = 0;
+        document.getElementById('menu-grade-math').innerHTML = `Base ${base}% <span style="color:var(--danger)">- Bias ${pen}%</span> = ${final}%`;
+        let classEl = document.getElementById('menu-grade-class');
+        if(final >= 70) { classEl.textContent = "1st Class Predicted"; classEl.style.color = "var(--success)"; }
+        else if(final >= 60) { classEl.textContent = "2:1 (Upper Second) Predicted"; classEl.style.color = "var(--t1d)"; }
+        else if(final >= 50) { classEl.textContent = "2:2 (Lower Second) Predicted"; classEl.style.color = "var(--warning)"; }
+        else if(final >= 40) { classEl.textContent = "3rd Class Predicted"; classEl.style.color = "var(--pnh)"; }
+        else { classEl.textContent = "Fail Predicted"; classEl.style.color = "var(--danger)"; }
+    }
+}
+
+function generateMarkerPenalty() {
+    State.markerPenalty = Math.floor(Math.random() * 30) + 1;
+    State.markerReason = MARKER_REASONS[Math.floor(Math.random() * MARKER_REASONS.length)];
+    let mb = document.getElementById('menu-bias-text');
+    if(mb) mb.textContent = `Examiner Bias: -${State.markerPenalty}%`;
+    updateMenuHUD();
+}
+
+function exitGameNoSave() {
+    if(confirm("Exit to menu without saving progress?")) {
+        cleanupGameEnv();
+        switchView('view-menu');
+    }
+}
+
+function saveAndMenu() {
+    cleanupGameEnv();
+    saveData(); loadData(); updateMenuHUD();
+    switchView('view-menu');
+}
+
+function resetLifelineBtn(type, btnId, defaultText) {
+    clearInterval(cooldownTimers[type]);
+    let btn = document.getElementById(btnId);
+    if(btn) {
+        btn.disabled = false;
+        btn.textContent = defaultText;
+        btn.style.background = ""; 
+    }
+}
+
+function cleanupGameEnv() {
+    State.activeGame = null;
+    State.isPaused = false;
+    isLockedOut = false;
+    clearInterval(lockoutTimerInterval);
+    document.getElementById('bottom-penalty-banner').style.display = 'none';
+    document.querySelectorAll('.game-container').forEach(el => el.classList.remove('locked-out'));
+    clearInterval(fidgetInterval);
+    document.getElementById('restart-btn').style.display = 'none';
+    document.getElementById('exit-save-btn').style.display = 'none';
+    document.getElementById('exit-nosave-btn').style.display = 'none';
+    document.getElementById('shared-components').appendChild(document.getElementById('fidget-container'));
+    document.getElementById('shared-components').appendChild(document.getElementById('lifeline-container'));
+    
+    resetLifelineBtn('fifty', 'll-fifty', '50/50');
+    resetLifelineBtn('phone', 'll-phone', 'Phone a Friend');
+    resetLifelineBtn('aud', 'll-aud', 'Ask Audience');
+    State.lifelines = { fifty: false, phone: false, aud: false };
+}
+
+function injectSharedUI(containerId) {
+    let container = document.getElementById(containerId);
+    container.appendChild(document.getElementById('lifeline-container'));
+    container.appendChild(document.getElementById('fidget-container'));
+    State.lifelines = { fifty: false, phone: false, aud: false };
+    resetLifelineBtn('fifty', 'll-fifty', '50/50');
+    resetLifelineBtn('phone', 'll-phone', 'Phone a Friend');
+    resetLifelineBtn('aud', 'll-aud', 'Ask Audience');
+}
+
+function resetFidget() {
+    if(Settings.fidgetEnabled) {
+        fidgetTime = 30; updateFidgetUI();
+    }
+}
+
+function startFidget() {
+    if(Settings.fidgetEnabled) {
+        document.getElementById('fidget-container').style.display = 'flex';
+        fidgetTime = 30; updateFidgetUI();
+        clearInterval(fidgetInterval);
+        fidgetInterval = setInterval(() => {
+            if(State.activeGame && !State.isPaused && !isLockedOut) {
+                fidgetTime--; updateFidgetUI();
+                if(fidgetTime <= 0) triggerGlobalLockout("FIDGET TIMEOUT!");
+            }
+        }, 1000);
+    } else {
+        clearInterval(fidgetInterval);
+        document.getElementById('fidget-container').style.display = 'none';
+    }
+}
+
+function hitFidget() {
+    if(!isLockedOut && !State.isPaused) {
+        resetFidget(); playSound('fidget');
+    }
+}
+
+function updateFidgetUI() {
+    let t = document.getElementById('fidget-time');
+    let b = document.getElementById('fidget-btn');
+    t.textContent = fidgetTime;
+    if(fidgetTime <= 5) { t.classList.add('urgent'); b.classList.add('urgent'); }
+    else { t.classList.remove('urgent'); b.classList.remove('urgent'); }
+}
+
+function triggerGlobalLockout(msg = "Incorrect Answer!") {
+    playSound('bad');
+    isLockedOut = true; secretSpamCount = 0; currentMistakes++;
+    resetFidget();
+    
+    let banner = document.getElementById('bottom-penalty-banner');
+    document.getElementById('penalty-banner-msg').textContent = msg;
+    banner.style.background = "var(--danger)";
+    banner.style.display = 'block';
+    document.querySelectorAll('.game-container').forEach(el => el.classList.add('locked-out'));
+    
+    currentPenaltyTimeLeft = Settings.penalty;
+    document.getElementById('penalty-banner-timer').textContent = currentPenaltyTimeLeft;
+    
+    clearInterval(lockoutTimerInterval);
+    lockoutTimerInterval = setInterval(() => {
+        if(State.isPaused) return;
+        currentPenaltyTimeLeft--; 
+        document.getElementById('penalty-banner-timer').textContent = currentPenaltyTimeLeft;
+        if(currentPenaltyTimeLeft <= 0) {
+            clearInterval(lockoutTimerInterval);
+            isLockedOut = false;
+            banner.style.display = 'none';
+            document.querySelectorAll('.game-container').forEach(el => el.classList.remove('locked-out'));
+        }
+    }, 1000);
+}
+
+function handleSecretSpam(isCorrect) {
+    if(!isLockedOut) return;
+    if(!isCorrect) { secretSpamCount = 0; return; }
+    secretSpamCount++;
+    if(secretSpamCount >= 5) {
+        isLockedOut = false; secretSpamCount = 0; resetFidget();
+        clearInterval(lockoutTimerInterval);
+        document.querySelectorAll('.game-container').forEach(el => el.classList.remove('locked-out'));
+        let banner = document.getElementById('bottom-penalty-banner');
+        banner.style.background = "var(--success)";
+        document.getElementById('penalty-banner-msg').textContent = "Skipped penalty!";
+        document.getElementById('penalty-banner-timer').textContent = "0";
+        setTimeout(() => { banner.style.display = 'none'; }, 1000);
+    }
+}
+
+function switchView(id) {
+    document.querySelectorAll('.view-screen').forEach(v => v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+function openSettings() {
+    document.getElementById('set-pen').value = Settings.penalty;
+    document.getElementById('set-cooldown').value = Settings.lifelineCooldown || 30;
+    document.getElementById('set-friend').value = Settings.friendName;
+    document.getElementById('set-fidget').checked = Settings.fidgetEnabled;
+    document.getElementById('set-fun').checked = Settings.funModeEnabled;
+    document.getElementById('set-cheat').checked = Settings.cheatMode;
+    document.getElementById('settings-modal').style.display = 'flex';
+}
+
+function saveSettings() {
+    Settings.penalty = parseInt(document.getElementById('set-pen').value) || 10;
+    Settings.lifelineCooldown = parseInt(document.getElementById('set-cooldown').value) || 30;
+    Settings.friendName = document.getElementById('set-friend').value || "Kalhara";
+    Settings.fidgetEnabled = document.getElementById('set-fidget').checked;
+    Settings.cheatMode = document.getElementById('set-cheat').checked;
+    let oldFun = Settings.funModeEnabled;
+    Settings.funModeEnabled = document.getElementById('set-fun').checked;
+    
+    // Apply penalty change immediately if currently locked out
+    if(isLockedOut && currentPenaltyTimeLeft > Settings.penalty) {
+        currentPenaltyTimeLeft = Settings.penalty;
+        document.getElementById('penalty-banner-timer').textContent = currentPenaltyTimeLeft;
+    }
+    
+    // Apply fidget change immediately
+    if(State.activeGame !== null) {
+        startFidget();
+    }
+    
+    try {
+        if(oldFun !== Settings.funModeEnabled && Settings.funModeEnabled) { 
+            if(getClears() > 0) generateMarkerPenalty(); 
+        }
+        updateMenuHUD(); saveData(); 
+    } catch(e) {}
+    
+    document.getElementById('settings-modal').style.display = 'none';
+}
+
+function showCheatSheet() { document.getElementById('cheat-modal').style.display = 'flex'; }
+function closeCheatSheet() { document.getElementById('cheat-modal').style.display = 'none'; }
+
+function openSlotMachine() {
+    playSound('reroll');
+    document.getElementById('slot-modal').style.display = 'flex';
+    document.getElementById('slot-close-btn').style.display = 'none';
+    let strip = document.getElementById('slot-strip');
+    strip.style.transform = 'translateY(0px)'; strip.style.transition = 'none'; strip.innerHTML = '';
+    let newPen = Math.floor(Math.random() * 30) + 1;
+    let newReason = MARKER_REASONS[Math.floor(Math.random() * MARKER_REASONS.length)];
+    for(let i=0; i<20; i++) {
+        let d = document.createElement('div'); d.className = 'slot-item';
+        if(i === 19) { d.textContent = `-${newPen}%: ${newReason}`; d.style.color = "var(--danger)"; }
+        else { d.textContent = `-${Math.floor(Math.random()*30)+1}%: Spinning...`; }
+        strip.appendChild(d);
+    }
+    setTimeout(() => {
+        strip.style.transition = 'transform 2.5s cubic-bezier(0.1, 1, 0.2, 1)';
+        strip.style.transform = `translateY(-${19 * 60}px)`;
+    }, 50);
+    setTimeout(() => {
+        State.markerPenalty = newPen; State.markerReason = newReason;
+        let mb = document.getElementById('menu-bias-text');
+        if(mb) mb.textContent = `Examiner Bias: -${State.markerPenalty}%`;
+        updateMenuHUD();
+        document.getElementById('slot-close-btn').style.display = 'inline-block';
+    }, 2600);
+}
+function closeSlot() { document.getElementById('slot-modal').style.display = 'none'; }
+
+function shuffle(arr) {
+    let a = [...arr];
+    for(let i=a.length-1; i>0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a;
+}
+function calculateScore(total, mistakes) {
+    return Math.max(0, Math.round(((total - mistakes) / total) * 100));
+}
+
+function showGameOver(title, score, mistakes) {
+    playSound('win');
+    document.getElementById('go-title').textContent = title;
+    document.getElementById('go-score').textContent = score + "%";
+    document.getElementById('go-score').style.color = score >= 50 ? "var(--success)" : "var(--danger)";
+    document.getElementById('go-mistakes').textContent = mistakes + (mistakes === 1 ? " Mistake" : " Mistakes");
+    document.getElementById('game-over-modal').style.display = 'flex';
+}
+function closeGameOver() {
+    document.getElementById('game-over-modal').style.display = 'none';
+    saveAndMenu();
+}
+
+function startGame(id, isRanked) {
+    playSound('start');
+    State.activeGame = id; State.isRanked = isRanked; State.isPaused = false; isLockedOut = false;
+    currentMistakes = 0; currentTotalQs = 0; secretSpamCount = 0;
+    document.getElementById('bottom-penalty-banner').style.display = 'none';
+    document.querySelectorAll('.game-container').forEach(el => el.classList.remove('locked-out'));
+    clearInterval(lockoutTimerInterval);
+    document.getElementById('restart-btn').style.display = 'inline-block';
+    document.getElementById('exit-save-btn').style.display = 'inline-block';
+    document.getElementById('exit-nosave-btn').style.display = 'inline-block';
+    
+    if(id === 1) { injectSharedUI('g1-container'); initG1(); }
+    if(id === 2) { injectSharedUI('g2-container'); initG2(); }
+    if(id === 3) { injectSharedUI('g3-container'); initG3(); }
+    startFidget();
+}
+
+function restartGame() {
+    if(State.activeGame !== null) { cleanupGameEnv(); startGame(State.activeGame, State.isRanked); }
+}
+
+function getCorrectTarget() {
+    if(State.activeGame === 1) return g1Queue[g1Index].c;
+    if(State.activeGame === 2) return g2Target;
+    if(State.activeGame === 3) return g3CorrectIdx;
+    return null;
+}
+
+function resetLifelineUI() {
+    document.querySelectorAll('.cat-hidden').forEach(el => el.classList.remove('cat-hidden'));
+    document.querySelectorAll('.g3-opt-btn').forEach(el => el.style.visibility = 'visible');
+}
+
+function startCooldown(type, btnId, defaultText) {
+    if(Settings.cheatMode) return;
+    let btn = document.getElementById(btnId);
+    btn.disabled = true;
+    let totalTime = Settings.lifelineCooldown || 30;
+    let timeLeft = totalTime;
+    
+    btn.textContent = `${defaultText} (${timeLeft}s)`;
+    btn.style.background = `linear-gradient(to right, var(--surface-highlight) 0%, rgba(0,0,0,0.5) 0%)`;
+
+    clearInterval(cooldownTimers[type]);
+    cooldownTimers[type] = setInterval(() => {
+        if(State.isPaused) return; 
+        timeLeft--;
+        if(timeLeft <= 0) {
+            clearInterval(cooldownTimers[type]);
+            btn.disabled = false;
+            btn.textContent = defaultText;
+            btn.style.background = ""; 
+            State.lifelines[type] = false;
+        } else {
+            let filledPct = ((totalTime - timeLeft) / totalTime) * 100;
+            btn.textContent = `${defaultText} (${timeLeft}s)`;
+            btn.style.background = `linear-gradient(to right, var(--surface-highlight) ${filledPct}%, rgba(0,0,0,0.5) ${filledPct}%)`;
+        }
+    }, 1000);
+}
+
+function useFifty() {
+    if(!Settings.cheatMode && State.lifelines.fifty) return;
+    State.lifelines.fifty = true;
+    
+    let correct = getCorrectTarget();
+    if(State.activeGame === 1 || State.activeGame === 2) {
+        let cats = shuffle(["T1D", "RA", "Allergy", "PNH"].filter(c => c !== correct));
+        let p = State.activeGame === 1 ? 'g1' : 'g2';
+        document.getElementById(`${p}-btn-${cats[0].toLowerCase()}`).classList.add('cat-hidden');
+        document.getElementById(`${p}-btn-${cats[1].toLowerCase()}`).classList.add('cat-hidden');
+    } else if(State.activeGame === 3) {
+        let opts = shuffle([0,1,2,3].filter(i => i !== correct));
+        document.getElementById(`g3-opt-${opts[0]}`).style.visibility = 'hidden';
+        document.getElementById(`g3-opt-${opts[1]}`).style.visibility = 'hidden';
+    }
+    startCooldown('fifty', 'll-fifty', '50/50');
+}
+
+function usePhone() {
+    if(!Settings.cheatMode && State.lifelines.phone) return;
+    State.lifelines.phone = true;
+    
+    document.getElementById('friend-modal').style.display = 'flex';
+    document.getElementById('friend-status').textContent = `Calling ${Settings.friendName}...`;
+    document.getElementById('friend-close').style.display = 'none';
+    let correct = getCorrectTarget();
+    let ansTxt = "";
+    if(State.activeGame === 1 || State.activeGame === 2) ansTxt = correct;
+    if(State.activeGame === 3) ansTxt = document.getElementById(`g3-opt-${correct}`).textContent;
+    setTimeout(() => {
+        document.getElementById('friend-status').textContent = `"${Settings.friendName} says: I'm pretty sure it's ${ansTxt}!"`;
+        document.getElementById('friend-close').style.display = 'inline-block';
+    }, 2000);
+    
+    startCooldown('phone', 'll-phone', 'Phone a Friend');
+}
+function closeFriend() { document.getElementById('friend-modal').style.display = 'none'; }
+
+function useAudience() {
+    if(!Settings.cheatMode && State.lifelines.aud) return;
+    State.lifelines.aud = true;
+    
+    document.getElementById('audience-modal').style.display = 'flex';
+    let chart = document.getElementById('aud-chart'); chart.innerHTML = '';
+    let correct = getCorrectTarget();
+    let labels = (State.activeGame === 3) ?["Opt 1","Opt 2","Opt 3","Opt 4"] :["T1D", "RA", "Allergy", "PNH"];
+    let correctIdx = (State.activeGame === 3) ? correct :["T1D", "RA", "Allergy", "PNH"].indexOf(correct);
+    let pcts = [0,0,0,0];
+    pcts[correctIdx] = Math.floor(Math.random() * 20) + 60;
+    let rem = 100 - pcts[correctIdx];
+    for(let i=0; i<4; i++) { if(i!==correctIdx) { let v = Math.floor(Math.random()*(rem+1)); pcts[i]=v; rem-=v; } }
+    pcts[(correctIdx+1)%4] += rem;
+    for(let i=0; i<4; i++) {
+        let wrap = document.createElement('div'); wrap.className = 'chart-bar-wrap';
+        let val = document.createElement('div'); val.className = 'chart-pct'; val.textContent = pcts[i]+"%";
+        let bar = document.createElement('div'); bar.className = 'chart-bar';
+        let lbl = document.createElement('div'); lbl.className = 'chart-label'; lbl.textContent = labels[i];
+        wrap.appendChild(val); wrap.appendChild(bar); wrap.appendChild(lbl); chart.appendChild(wrap);
+        setTimeout(() => { bar.style.height = pcts[i]+"%"; }, 100);
+    }
+    
+    startCooldown('aud', 'll-aud', 'Ask Audience');
+}
+function closeAudience() { document.getElementById('audience-modal').style.display = 'none'; }
+
+let g1Queue =[]; let g1Index = 0;
+function initG1() {
+    switchView('view-g1');
+    document.getElementById('g1-badge').textContent = State.isRanked ? "Full Mode" : "Practice Mode";
+    document.getElementById('g1-badge').style.color = State.isRanked ? "var(--warning)" : "var(--accent)";
+    let master = [];
+    for(let key in DATA) DATA[key].forEach(txt => master.push({ t: txt, c: key }));
+    master = shuffle(master);
+    let len = State.isRanked ? master.length : Math.max(1, Math.ceil(master.length * 0.25));
+    g1Queue = master.slice(0, len); g1Index = 0; currentTotalQs = g1Queue.length;
+    loadG1Item();
+}
+function loadG1Item() {
+    resetLifelineUI();
+    if(g1Index >= g1Queue.length) {
+        if(State.isRanked) {
+            let finalScore = calculateScore(currentTotalQs, currentMistakes);
+            State.scores.g1 = finalScore;
+            showGameOver("Match Game Complete!", finalScore, currentMistakes);
+        } else showGameOver("Practice Complete!", calculateScore(currentTotalQs, currentMistakes), currentMistakes);
+        return;
+    }
+    document.getElementById('g1-active-item').textContent = g1Queue[g1Index].t;
+    document.getElementById('g1-progress').textContent = `Item: ${g1Index + 1}/${g1Queue.length}`;
+}
+function checkG1(cat) {
+    if(isLockedOut) { handleSecretSpam(cat === g1Queue[g1Index].c); return; }
+    if(g1Queue[g1Index].c === cat) { 
+        playSound('good'); resetFidget(); g1Index++; loadG1Item(); 
+    } else triggerGlobalLockout("Mismatched Category!");
+}
+
+let g2Pct = 50; let g2Lvl = 1; let g2Q = 0; let g2Target = ""; let g2MaxLvl = 7;
+function initG2() {
+    switchView('view-g2');
+    document.getElementById('g2-badge').textContent = State.isRanked ? "Full Mode" : "Practice Mode";
+    document.getElementById('g2-badge').style.color = State.isRanked ? "var(--warning)" : "var(--accent)";
+    g2Pct = 50; g2Lvl = 1; g2Q = 0;
+    g2MaxLvl = State.isRanked ? 7 : 2;
+    currentTotalQs = g2MaxLvl * 4;
+    document.getElementById('g2-max-lvl').textContent = g2MaxLvl;
+    loadG2Item();
+}
+function loadG2Item() {
+    resetLifelineUI();
+    let keys = Object.keys(DATA); g2Target = keys[Math.floor(Math.random() * keys.length)];
+    let source = DATA[g2Target];
+    let numToShow = Math.max(1, Math.round((g2Pct / 100) * source.length));
+    let selected = shuffle(source).slice(0, numToShow);
+    let board = document.getElementById('g2-board'); board.innerHTML = '';
+    selected.forEach(k => { let s = document.createElement('span'); s.className = 'keyword-chip'; s.textContent = k; board.appendChild(s); });
+    document.getElementById('g2-lvl').textContent = g2Lvl;
+    document.getElementById('g2-pct').textContent = (Number.isInteger(g2Pct) ? g2Pct : g2Pct.toFixed(2)) + "%";
+    document.getElementById('g2-q').textContent = `${g2Q + 1}/4`;
+}
+function checkG2(cat) {
+    if(isLockedOut) { handleSecretSpam(cat === g2Target); return; }
+    if(cat === g2Target) {
+        playSound('good'); resetFidget(); g2Q++;
+        if(g2Q >= 4) {
+            g2Q = 0; g2Lvl++; g2Pct = g2Pct / 2;
+            if(g2Lvl > g2MaxLvl) { 
+                if(State.isRanked) {
+                    let finalScore = calculateScore(currentTotalQs, currentMistakes);
+                    State.scores.g2 = finalScore; 
+                    showGameOver("Decay Master Complete!", finalScore, currentMistakes);
+                } else showGameOver("Practice Complete!", calculateScore(currentTotalQs, currentMistakes), currentMistakes);
+                return; 
+            }
+        }
+        loadG2Item();
+    } else triggerGlobalLockout("Wrong Diagnosis!");
+}
+
+let g3Stages =[]; let g3CurrentTopic = ""; let g3Questions =[]; let g3QIdx = 0; let g3StageCount = 1; let g3CorrectIdx = -1;
+function initG3() {
+    switchView('view-g3');
+    document.getElementById('g3-badge').textContent = State.isRanked ? "Full Mode" : "Practice Mode";
+    document.getElementById('g3-badge').style.color = State.isRanked ? "var(--warning)" : "var(--accent)";
+    g3Stages = shuffle(Object.keys(BLANKS)); g3StageCount = 1; currentTotalQs = 0;
+    if(State.isRanked) Object.keys(BLANKS).forEach(k => currentTotalQs += BLANKS[k].length);
+    else Object.keys(BLANKS).forEach(k => currentTotalQs += Math.max(1, Math.ceil(BLANKS[k].length * 0.25)));
+    nextG3Stage();
+}
+function nextG3Stage() {
+    if(g3Stages.length === 0) {
+        if(State.isRanked) {
+            let finalScore = calculateScore(currentTotalQs, currentMistakes);
+            State.scores.g3 = finalScore; 
+            showGameOver("Blanks Complete!", finalScore, currentMistakes);
+        } else showGameOver("Practice Complete!", calculateScore(currentTotalQs, currentMistakes), currentMistakes);
+        return;
+    }
+    g3CurrentTopic = g3Stages.pop();
+    let fullList = shuffle([...BLANKS[g3CurrentTopic]]);
+    let len = State.isRanked ? fullList.length : Math.max(1, Math.ceil(fullList.length * 0.25));
+    g3Questions = fullList.slice(0, len); g3QIdx = 0;
+    document.getElementById('g3-stage').textContent = `${g3StageCount}/4`;
+    document.getElementById('g3-topic').textContent = `(${g3CurrentTopic})`;
+    g3StageCount++; loadG3Q();
+}
+function loadG3Q() {
+    resetLifelineUI();
+    if(g3QIdx >= g3Questions.length) { nextG3Stage(); return; }
+    document.getElementById('g3-progress').textContent = `${g3QIdx+1}/${g3Questions.length}`;
+    let q = g3Questions[g3QIdx];
+    document.getElementById('g3-question').innerHTML = q.q.replace("_____", '<span class="blank-space">?</span>');
+    let opts = shuffle([q.a, ...q.d]);
+    for(let i=0; i<4; i++) {
+        let b = document.getElementById('g3-opt-'+i);
+        b.textContent = opts[i];
+        if(opts[i] === q.a) g3CorrectIdx = i;
+    }
+}
+function checkG3(idx) {
+    if(isLockedOut) { handleSecretSpam(idx === g3CorrectIdx); return; }
+    if(idx === g3CorrectIdx) { 
+        playSound('good'); resetFidget(); g3QIdx++; loadG3Q(); 
+    } else triggerGlobalLockout("Incorrect Blank!");
+}
+
+window.onload = init;
+</script>
+</body>
+</html>
